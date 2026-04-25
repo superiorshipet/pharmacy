@@ -90,7 +90,7 @@ public class ChatbotController : ControllerBase
             return Unauthorized();
 
         var apiKey = _config["Groq:ApiKey"];
-        var model = _config["Groq:Model"] ?? "mixtral-8x7b-32768";
+        var model = _config["Groq:Model"] ?? "llama-3.3-70b-versatile";
         
         try
         {

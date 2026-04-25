@@ -1,5 +1,7 @@
 // API Configuration
-const API_URL = 'http://localhost:5000/api';
+// In production (Railway), the frontend should call the deployed backend URL.
+// Set BACKEND_URL to your Railway backend URL, or leave empty to use same origin.
+const API_URL = (window.BACKEND_URL || '') + '/api';
 
 console.log('📡 API URL:', API_URL);
 
@@ -50,5 +52,9 @@ const api = {
         getMedications: () => apiRequest('/admin/medications'),
         createMedication: (data) => apiRequest('/admin/medications', { method: 'POST', body: JSON.stringify(data) }),
         deleteMedication: (id) => apiRequest(`/admin/medications/${id}`, { method: 'DELETE' })
+    },
+    chatbot: {
+        chat: (messages) => apiRequest('/chatbot/chat', { method: 'POST', body: JSON.stringify({ messages }) }),
+        getHistory: () => apiRequest('/chatbot/history')
     }
 };

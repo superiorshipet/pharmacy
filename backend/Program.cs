@@ -17,7 +17,6 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "API for Dawaee Medical Platform"
     });
-    
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -27,7 +26,6 @@ builder.Services.AddSwaggerGen(c =>
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
         Description = "Enter 'Bearer' [space] and then your token"
     });
-    
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
@@ -44,19 +42,36 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Database - Auto detect environment (Local or Railway)
+// Database - Auto detect environment
 var isRailway = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT"));
-var connectionString = isRailway 
-    ? builder.Configuration.GetConnectionString("RailwayConnection")
-    : builder.Configuration.GetConnectionString("LocalConnection");
 
-Console.WriteLine($"🚀 Running in {(isRailway ? "RAILWAY (Production)" : "LOCAL (Development)")} mode");
-Console.WriteLine($"📡 Connecting to database...");
+string? connectionString;
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    // Railway sets DATABASE_URL as postgres://user:pass@host:port/db
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+    Console.WriteLine("🚀 Using DATABASE_URL from Railway");
+}
+else if (isRailway)
+{
+    connectionString = builder.Configuration.GetConnectionString("RailwayConnection");
+    Console.WriteLine("🚀 Running in RAILWAY mode (RailwayConnection)");
+}
+else
+{
+    connectionString = builder.Configuration.GetConnectionString("LocalConnection");
+    Console.WriteLine("💻 Running in LOCAL mode");
+}
+
+Console.WriteLine("📡 Connecting to database...");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString, npgsqlOptions =>
     {
-        npgsqlOptions.EnableRetryOnFailure(3);
+        npgsqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
         npgsqlOptions.CommandTimeout(60);
     }));
 
@@ -65,9 +80,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
 });
 
@@ -93,25 +106,28 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// Configure pipeline
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-else
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dawaee API v1");
+    c.RoutePrefix = "swagger";
+});
 
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Health check endpoints
-app.MapGet("/", () => Results.Redirect("/swagger"));
+// Return JSON at root instead of redirecting to swagger
+app.MapGet("/", () => Results.Ok(new {
+    name = "Dawaee Medical API",
+    version = "v1",
+    status = "running",
+    swagger = "/swagger",
+    health = "/health",
+    timestamp = DateTime.UtcNow
+}));
+
 app.MapGet("/health", () => Results.Ok(new { 
     status = "healthy", 
     environment = isRailway ? "railway" : "local",
@@ -151,139 +167,100 @@ using (var scope = app.Services.CreateScope())
             
             if (!db.Users.Any(u => u.Email == "admin@dawaee.com"))
             {
-                var admin = new User
+                db.Users.AddRange(new User
                 {
-                    FirstName = "Admin",
-                    LastName = "Dawaee",
-                    Email = "admin@dawaee.com",
+                    FirstName = "Admin", LastName = "Dawaee", Email = "admin@dawaee.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
-                    Role = "Admin",
-                    CreatedAt = DateTime.UtcNow
-                };
-                db.Users.Add(admin);
-                
-                var patient = new User
+                    Role = "Admin", CreatedAt = DateTime.UtcNow
+                }, new User
                 {
-                    FirstName = "Test",
-                    LastName = "Patient",
-                    Email = "patient@test.com",
+                    FirstName = "Test", LastName = "Patient", Email = "patient@test.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Patient123!"),
-                    Role = "Patient",
-                    CreatedAt = DateTime.UtcNow
-                };
-                db.Users.Add(patient);
+                    Role = "Patient", CreatedAt = DateTime.UtcNow
+                });
                 db.SaveChanges();
             }
             Console.WriteLine($"✅ Seeded {meds.Count} medications");
         }
         else
         {
-            Console.WriteLine($"✅ Database ready: {db.Medications.Count()} medications, {db.Users.Count()} users");
+            Console.WriteLine($"✅ DB ready: {db.Medications.Count()} medications, {db.Users.Count()} users");
         }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Database error: {ex.Message}");
+        Console.WriteLine($"❌ DB error: {ex.Message}");
+        Console.WriteLine($"   Inner: {ex.InnerException?.Message}");
         if (!isRailway)
-        {
-            Console.WriteLine("💡 Make sure PostgreSQL is running locally: sudo service postgresql start");
-        }
+            Console.WriteLine("💡 Start PostgreSQL: sudo service postgresql start");
     }
 }
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-var url = isRailway ? $"http://0.0.0.0:{port}" : $"http://localhost:{port}";
+Console.WriteLine("\n✅ DAWAEE BACKEND RUNNING");
+Console.WriteLine($"   Environment: {(isRailway ? "RAILWAY" : "LOCAL")}");
+Console.WriteLine("   Admin: admin@dawaee.com / Admin123!");
+Console.WriteLine("   Patient: patient@test.com / Patient123!\n");
 
-Console.WriteLine("\n╔════════════════════════════════════════════════════╗");
-Console.WriteLine($"║           🚀 DAWAEE BACKEND RUNNING              ║");
-Console.WriteLine("╠════════════════════════════════════════════════════╣");
-Console.WriteLine($"║  Environment: {(isRailway ? "🌐 RAILWAY" : "💻 LOCAL")}                              ║");
-Console.WriteLine($"║  Port: {port}                                            ║");
-Console.WriteLine($"║  URL: {url}                                    ║");
-Console.WriteLine($"║  Swagger: {url}/swagger                               ║");
-Console.WriteLine("╠════════════════════════════════════════════════════╣");
-Console.WriteLine("║  👤 LOGIN CREDENTIALS:                             ║");
-Console.WriteLine("║     Admin: admin@dawaee.com / Admin123!            ║");
-Console.WriteLine("║     Patient: patient@test.com / Patient123!        ║");
-Console.WriteLine("╚════════════════════════════════════════════════════╝\n");
+// ✅ CRITICAL: Do NOT pass a URL to app.Run()
+// Railway uses ASPNETCORE_URLS env var to set the port
+app.Run();
 
-app.Run(url);
-
-// Helper methods for seeding
 static string GetMedicationNameAr(int i)
 {
     string[] names = { "بانادول", "بروفين", "أوجمنتين", "سيبروفلوكساسين", "أموكسيسيلين", 
                        "ديكلوفيناك", "أوميبرازول", "لوراتادين", "بيتاهايستين", "فنتولين" };
-    return $"{names[i % names.Length]}";
+    return names[i % names.Length];
 }
-
 static string GetMedicationNameEn(int i)
 {
     string[] names = { "Panadol", "Brufen", "Augmentin", "Ciprofloxacin", "Amoxicillin",
                        "Diclofenac", "Omeprazole", "Loratadine", "Betahistine", "Ventolin" };
-    return $"{names[i % names.Length]}";
+    return names[i % names.Length];
 }
-
 static string GetActiveIngredientAr(int i)
 {
     string[] ingredients = { "باراسيتامول", "ايبوبروفين", "أموكسيسيلين+حمض كلافولانيك", "سيبروفلوكساسين", 
-                              "أموكسيسيلين", "ديكلوفيناك صوديوم", "أوميبرازول", "لوراتادين", "بيتاهايستين", 
-                              "سالبوتامول" };
+                              "أموكسيسيلين", "ديكلوفيناك صوديوم", "أوميبرازول", "لوراتادين", "بيتاهايستين", "سالبوتامول" };
     return ingredients[i % ingredients.Length];
 }
-
 static string GetActiveIngredientEn(int i)
 {
     string[] ingredients = { "Paracetamol", "Ibuprofen", "Amoxicillin+Clavulanic acid", "Ciprofloxacin",
-                              "Amoxicillin", "Diclofenac Sodium", "Omeprazole", "Loratadine", "Betahistine",
-                              "Salbutamol" };
+                              "Amoxicillin", "Diclofenac Sodium", "Omeprazole", "Loratadine", "Betahistine", "Salbutamol" };
     return ingredients[i % ingredients.Length];
 }
-
 static string GetDescriptionAr(int i)
 {
-    string[] descriptions = { 
-        "مسكن للآلام وخافض للحرارة يستخدم لعلاج الصداع وآلام الأسنان والحمى.",
-        "مضاد للالتهابات غير ستيرويدي يستخدم لتسكين الآلام وتخفيف الالتهاب.",
-        "مضاد حيوي واسع المجال لعلاج العدوى البكتيرية.",
-        "مضاد حيوي من مجموعة الفلوروكينولونات لعلاج الالتهابات البكتيرية."
-    };
-    return descriptions[i % descriptions.Length];
+    string[] d = { "مسكن للآلام وخافض للحرارة يستخدم لعلاج الصداع وآلام الأسنان والحمى.",
+                   "مضاد للالتهابات غير ستيرويدي يستخدم لتسكين الآلام وتخفيف الالتهاب.",
+                   "مضاد حيوي واسع المجال لعلاج العدوى البكتيرية.",
+                   "مضاد حيوي من مجموعة الفلوروكينولونات لعلاج الالتهابات البكتيرية." };
+    return d[i % d.Length];
 }
-
 static string GetDescriptionEn(int i)
 {
-    string[] descriptions = {
-        "Pain reliever and fever reducer used to treat headaches, toothaches, and fever.",
-        "Non-steroidal anti-inflammatory drug used for pain relief and inflammation reduction.",
-        "Broad-spectrum antibiotic for treating bacterial infections.",
-        "Fluoroquinolone antibiotic for treating bacterial infections."
-    };
-    return descriptions[i % descriptions.Length];
+    string[] d = { "Pain reliever and fever reducer used to treat headaches, toothaches, and fever.",
+                   "Non-steroidal anti-inflammatory drug used for pain relief and inflammation reduction.",
+                   "Broad-spectrum antibiotic for treating bacterial infections.",
+                   "Fluoroquinolone antibiotic for treating bacterial infections." };
+    return d[i % d.Length];
 }
-
 static string GetWarningsAr(int i)
 {
-    string[] warnings = {
-        "لا تتجاوز الجرعة الموصى بها لتجنب تسمم الكبد.",
-        "قد يسبب تهيج في المعدة، يفضل تناوله مع الطعام.",
-        "يمنع استخدامه لمن لديهم حساسية من البنسلين.",
-        "تجنب التعرض للشمس أثناء العلاج بهذا الدواء."
-    };
-    return warnings[i % warnings.Length];
+    string[] w = { "لا تتجاوز الجرعة الموصى بها لتجنب تسمم الكبد.",
+                   "قد يسبب تهيج في المعدة، يفضل تناوله مع الطعام.",
+                   "يمنع استخدامه لمن لديهم حساسية من البنسلين.",
+                   "تجنب التعرض للشمس أثناء العلاج بهذا الدواء." };
+    return w[i % w.Length];
 }
-
 static string GetWarningsEn(int i)
 {
-    string[] warnings = {
-        "Do not exceed recommended dose to avoid liver toxicity.",
-        "May cause stomach irritation, take with food.",
-        "Contraindicated for those with penicillin allergy.",
-        "Avoid sun exposure while taking this medication."
-    };
-    return warnings[i % warnings.Length];
+    string[] w = { "Do not exceed recommended dose to avoid liver toxicity.",
+                   "May cause stomach irritation, take with food.",
+                   "Contraindicated for those with penicillin allergy.",
+                   "Avoid sun exposure while taking this medication." };
+    return w[i % w.Length];
 }
-
 static string GetDangerLevel(int i)
 {
     if (i % 5 == 0) return "high";
