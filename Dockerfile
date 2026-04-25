@@ -23,5 +23,5 @@ COPY --from=publish /app/publish .
 # Set environment variable for Railway
 ENV ASPNETCORE_URLS=http://+:8080
 ENV RAILWAY_ENVIRONMENT=true
-
+COPY frontend/ wwwroot/
 ENTRYPOINT ["dotnet", "DawaeeBackend.dll"]

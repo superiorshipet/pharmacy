@@ -114,19 +114,12 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseCors("AllowAll");
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
-// Return JSON at root instead of redirecting to swagger
-app.MapGet("/", () => Results.Ok(new {
-    name = "Dawaee Medical API",
-    version = "v1",
-    status = "running",
-    swagger = "/swagger",
-    health = "/health",
-    timestamp = DateTime.UtcNow
-}));
+app.MapFallbackToFile("index.html");
 
 app.MapGet("/health", () => Results.Ok(new { 
     status = "healthy", 
