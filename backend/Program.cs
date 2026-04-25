@@ -118,13 +118,12 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapFallbackToFile("index.html");
-
 app.MapGet("/health", () => Results.Ok(new { 
     status = "healthy", 
     environment = isRailway ? "railway" : "local",
     timestamp = DateTime.UtcNow 
 }));
+app.MapFallbackToFile("index.html"); // ← MUST be last
 
 // Migrate and seed database
 using (var scope = app.Services.CreateScope())
