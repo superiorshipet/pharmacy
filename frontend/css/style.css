@@ -1,0 +1,161 @@
+* {
+    font-family: 'Cairo', system-ui, sans-serif;
+}
+
+body {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Light Mode */
+body:not(.dark) {
+    background: #f0fdf4;
+}
+
+body:not(.dark) .bg-white {
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Hero text */
+body:not(.dark) .bg-gradient-to-r h1,
+body:not(.dark) .bg-gradient-to-r p {
+    color: white !important;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+body.dark .modal-content {
+    background: #1e293b;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Loading spinner */
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #10b981;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Table */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 16px;
+    text-align: right;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+body.dark .data-table th,
+body.dark .data-table td {
+    border-bottom-color: #334155;
+}
+
+/* Schedule card */
+.schedule-card {
+    transition: all 0.2s;
+}
+
+.schedule-card:hover {
+    transform: translateX(-4px);
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: #64748b;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+}
+
+/* Chatbot */
+#chatbotWindow {
+    backdrop-filter: blur(10px);
+}
+
+/* Dark mode */
+body.dark {
+    background: #0f172a;
+}
+
+body.dark .bg-white {
+    background-color: #1e293b;
+}
+
+body.dark .text-gray-800,
+body.dark .text-gray-700 {
+    color: #f1f5f9 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .data-table {
+        font-size: 0.8rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 8px 12px;
+    }
+}

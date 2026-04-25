@@ -1,2 +1,42 @@
-history/
-.history
+# Dependencies
+backend/bin/
+backend/obj/
+backend/.vs/
+backend/.vscode/
+
+# Database
+*.db
+*.sqlite
+
+# User secrets
+backend/appsettings.Development.json
+
+# Environment files
+.env
+.env.local
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+
+# Visual Studio
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# dotnet
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Railway
+.railway/
