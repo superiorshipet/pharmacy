@@ -77,7 +77,7 @@
     // ========== AUTO-DETECT ENVIRONMENT ==========
     const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
     // Change this to your Railway app URL when deployed
-    const RAILWAY_URL = 'https://dawaee-backend.up.railway.app'; // 👈 استبدل هذا باسم تطبيقك على Railway
+    const RAILWAY_URL = 'https://pharmacy-production-eea1.up.railway.app'; // 👈 استبدل هذا باسم تطبيقك على Railway
     const API_URL = isProduction ? `${RAILWAY_URL}/api` : 'http://localhost:5000/api';
     
     console.log(`🌍 Environment: ${isProduction ? 'Production (Railway)' : 'Local'}`);
