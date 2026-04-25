@@ -1,19 +1,16 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore
 COPY backend/*.csproj backend/
-RUN dotnet restore "backend/DawaeeBackend.csproj"
+RUN dotnet restore "backend/DawaeeBackend.csproj" --runtime linux-x64
 
 # Copy everything and build
 COPY backend/ backend/
 WORKDIR "/src/backend"
-RUN dotnet build "DawaeeBackend.csproj" -c Release -o /app/build
+RUN dotnet publish "DawaeeBackend.csproj" -c Release -o /app/publish -r linux-x64 --self-contained false
 
-FROM build AS publish
-RUN dotnet publish "DawaeeBackend.csproj" -c Release -o /app/publish
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
