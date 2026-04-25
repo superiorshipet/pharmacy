@@ -3,7 +3,8 @@ backend/bin/
 backend/obj/
 backend/.vs/
 backend/.vscode/
-
+history/
+.history
 # Database
 *.db
 *.sqlite
