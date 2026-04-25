@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>دوائي - المنصة الطبية الشاملة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دوائي - المنصة الطبية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -12,61 +12,14 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-        body { min-height: 100vh; width: 100%; overflow-x: hidden; }
-        #root { min-height: 100vh; width: 100%; display: flex; flex-direction: column; }
-        main { flex: 1; }
-        
-        /* Toast Notification */
-        .toast { position: fixed; bottom: 20px; right: 20px; z-index: 10000; padding: 12px 20px; border-radius: 12px; animation: slideIn 0.3s; }
+        * { font-family: 'Cairo', sans-serif; }
+        body { transition: all 0.3s; }
+        .toast { position: fixed; bottom: 20px; right: 20px; z-index: 1000; padding: 12px 20px; border-radius: 12px; animation: slideIn 0.3s; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        
-        /* Modal */
-        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(4px); }
-        .modal-content { background: white; border-radius: 1rem; padding: 1.5rem; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 1rem; padding: 1.5rem; max-width: 500px; width: 90%; }
         .dark .modal-content { background: #1f2937; }
-        
-        /* Chatbot Styles */
-        .chatbot-btn { position: fixed; bottom: 20px; right: 20px; z-index: 999; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #059669, #047857); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform 0.2s; }
-        .chatbot-btn:hover { transform: scale(1.05); }
-        .chatbot-window { position: fixed; bottom: 90px; right: 20px; width: 380px; height: 550px; background: white; border-radius: 1rem; box-shadow: 0 10px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; z-index: 1000; overflow: hidden; }
-        .dark .chatbot-window { background: #1f2937; border: 1px solid #374151; }
-        .chat-header { background: linear-gradient(135deg, #059669, #047857); color: white; padding: 14px; display: flex; justify-content: space-between; align-items: center; }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: #f9fafb; }
-        .dark .chat-messages { background: #111827; }
-        .message-user { align-self: flex-end; background: linear-gradient(135deg, #059669, #047857); color: white; padding: 10px 14px; border-radius: 18px; max-width: 80%; font-size: 14px; word-wrap: break-word; }
-        .message-bot { align-self: flex-start; background: #e5e7eb; color: #1f2937; padding: 10px 14px; border-radius: 18px; max-width: 80%; font-size: 14px; word-wrap: break-word; }
-        .dark .message-bot { background: #374151; color: #f3f4f6; }
-        .chat-input-area { padding: 12px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; background: white; }
-        .dark .chat-input-area { background: #1f2937; border-top-color: #374151; }
-        .chat-input { flex: 1; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 24px; outline: none; font-size: 14px; }
-        .dark .chat-input { background: #374151; border-color: #4b5563; color: white; }
-        .chat-send { background: #059669; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: background 0.2s; }
-        .chat-send:hover { background: #047857; }
-        .hidden-chat { display: none !important; }
-        .typing { display: flex; gap: 4px; padding: 10px 14px; background: #e5e7eb; border-radius: 18px; width: fit-content; }
-        .dark .typing { background: #374151; }
-        .typing-dot { width: 8px; height: 8px; background: #9ca3af; border-radius: 50%; animation: typing 1.4s infinite; }
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
-        
-        /* Schedule Items */
-        .schedule-item { transition: all 0.2s; }
-        .schedule-item:hover { background: #f3f4f6; }
-        .dark .schedule-item:hover { background: #374151; }
-        
-        /* Card Hover */
-        .med-card { transition: all 0.3s; }
-        .med-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .chatbot-window { width: calc(100vw - 40px); right: 20px; left: 20px; height: 500px; }
-            .modal-content { width: 95%; padding: 1rem; }
-        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
@@ -74,16 +27,12 @@
 <div id="root"></div>
 
 <script>
-    // ========== AUTO-DETECT ENVIRONMENT ==========
-    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-    // Change this to your Railway app URL when deployed
-    const RAILWAY_URL = 'https://dawaee-backend.up.railway.app'; // 👈 استبدل هذا باسم تطبيقك على Railway
-    const API_URL = isProduction ? `${RAILWAY_URL}/api` : 'http://localhost:5000/api';
+    // ========== CONFIG ==========
+    // استخدم عنوان Railway مباشرة
+    const API_URL = 'https://pharmacy-production-6a66.up.railway.app/api';
     
-    console.log(`🌍 Environment: ${isProduction ? 'Production (Railway)' : 'Local'}`);
-    console.log(`📡 API URL: ${API_URL}`);
+    console.log('📡 API URL:', API_URL);
     
-    // ========== GLOBAL VARIABLES ==========
     let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
     let currentLang = localStorage.getItem('lang') || 'ar';
     let currentTheme = localStorage.getItem('theme') || 'light';
@@ -107,15 +56,14 @@
             adminPanel: 'لوحة الأدمن', patients: 'المرضى', medications: 'الأدوية', actions: 'إجراءات',
             addMedication: 'إضافة دواء', nameAr: 'الاسم', activeIngredient: 'المادة الفعالة',
             description: 'الوصف', warnings: 'التحذيرات', dangerLevel: 'الخطورة', save: 'حفظ', delete: 'حذف',
-            botTitle: 'المساعد الطبي الذكي', botPlaceholder: 'اكتب استفسارك الطبي...', 
-            botWelcome: 'مرحباً! أنا دواءي، مساعدك الطبي الذكي. كيف أساعدك اليوم؟'
+            botTitle: 'المساعد الطبي', botPlaceholder: 'اكتب استفسارك الطبي...', botWelcome: 'مرحباً! أنا دواءي، مساعدك الطبي. كيف أساعدك؟'
         },
         en: {
             appName: 'Dawaee', home: 'Home', dashboard: 'Dashboard', logout: 'Logout',
             login: 'Login', register: 'Sign Up', email: 'Email', password: 'Password',
             firstName: 'First Name', lastName: 'Last Name', diseases: 'Chronic Diseases',
             loginTitle: 'Welcome Back', registerTitle: 'Create Account', noAccount: "Don't have an account?",
-            heroTitle: 'Your Complete Medication Guide', heroDesc: 'Search medications and learn about active ingredients',
+            heroTitle: 'Medication Guide', heroDesc: 'Search medications and learn about warnings',
             searchPlaceholder: 'Search medication...', medDirectory: 'Medications', noResults: 'No results',
             interactionWarning: '⚠️ Warning:', welcome: 'Welcome', patient: 'Patient',
             dailySchedule: 'Daily Schedule', today: 'Today', taken: 'Taken', notTaken: 'Not Taken',
@@ -125,8 +73,7 @@
             adminPanel: 'Admin Panel', patients: 'Patients', medications: 'Medications', actions: 'Actions',
             addMedication: 'Add Medication', nameAr: 'Name', activeIngredient: 'Active Ingredient',
             description: 'Description', warnings: 'Warnings', dangerLevel: 'Danger Level', save: 'Save', delete: 'Delete',
-            botTitle: 'AI Medical Assistant', botPlaceholder: 'Type your medical question...',
-            botWelcome: 'Hello! I am Dawaee, your AI medical assistant. How can I help you today?'
+            botTitle: 'Medical Assistant', botPlaceholder: 'Type your medical question...', botWelcome: 'Hello! I am Dawaee, your medical assistant. How can I help?'
         }
     };
     function t(key) { return trans[currentLang][key] || key; }
@@ -151,7 +98,7 @@
 
     function closeModal() { document.querySelector('.modal')?.remove(); }
 
-    // ========== AUTH FUNCTIONS ==========
+    // ========== AUTH ==========
     window.handleLogin = async (e) => {
         e.preventDefault();
         try {
@@ -159,10 +106,10 @@
             localStorage.setItem('token', res.token);
             localStorage.setItem('currentUser', JSON.stringify(res));
             currentUser = res;
-            showToast('✅ تم الدخول بنجاح');
+            showToast('✅ تم الدخول');
             currentPage = 'home';
             render();
-        } catch(e) { showToast('❌ خطأ في البريد أو كلمة المرور', 'error'); }
+        } catch(e) { showToast('❌ خطأ', 'error'); }
     };
 
     window.handleRegister = async (e) => {
@@ -172,13 +119,13 @@
             localStorage.setItem('token', res.token);
             localStorage.setItem('currentUser', JSON.stringify(res));
             currentUser = res;
-            showToast('✅ تم إنشاء الحساب بنجاح');
+            showToast('✅ تم التسجيل');
             currentPage = 'home';
             render();
-        } catch(e) { showToast('❌ خطأ في التسجيل', 'error'); }
+        } catch(e) { showToast('❌ خطأ', 'error'); }
     };
 
-    window.logout = () => { localStorage.clear(); currentUser = null; currentPage = 'home'; showToast('تم تسجيل الخروج'); render(); };
+    window.logout = () => { localStorage.clear(); currentUser = null; currentPage = 'home'; showToast('تم الخروج'); render(); };
     window.navigate = (page) => { currentPage = page; localStorage.setItem('currentPage', page); render(); };
     window.toggleTheme = () => { currentTheme = currentTheme === 'light' ? 'dark' : 'light'; localStorage.setItem('theme', currentTheme); document.documentElement.classList.toggle('dark'); render(); };
     window.toggleLang = () => { currentLang = currentLang === 'ar' ? 'en' : 'ar'; localStorage.setItem('lang', currentLang); render(); };
@@ -186,22 +133,19 @@
     // ========== NAVBAR ==========
     function Navbar() {
         const token = localStorage.getItem('token');
-        return `<nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50 px-4 py-3 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="navigate('home')">
-                <i class="fa-solid fa-heartbeat text-emerald-600 text-2xl"></i>
-                <span class="text-xl font-bold text-gray-800 dark:text-white">${t('appName')}</span>
-            </div>
-            <div class="flex gap-3 items-center flex-wrap">
+        return `<nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50 px-4 py-3 flex justify-between items-center border-b dark:border-gray-700">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="navigate('home')"><i class="fa-solid fa-heartbeat text-emerald-600 text-2xl"></i><span class="text-xl font-bold text-gray-800 dark:text-white">${t('appName')}</span></div>
+            <div class="flex gap-3 items-center">
                 <button onclick="toggleTheme()" class="text-gray-700 dark:text-white"><i class="fa-solid ${currentTheme === 'light' ? 'fa-moon' : 'fa-sun'}"></i></button>
                 <button onclick="toggleLang()" class="text-gray-700 dark:text-white"><i class="fa-solid fa-globe"></i> ${currentLang === 'ar' ? 'EN' : 'عربي'}</button>
                 ${token && currentUser ? `
                     <button onclick="navigate('home')" class="text-gray-700 dark:text-white">${t('home')}</button>
                     <button onclick="navigate('dashboard')" class="text-gray-700 dark:text-white">${t('dashboard')}</button>
-                    ${currentUser.role === 'Admin' ? `<button onclick="navigate('admin')" class="text-purple-600 dark:text-purple-400 font-bold">${t('adminPanel')}</button>` : ''}
+                    ${currentUser.role === 'Admin' ? `<button onclick="navigate('admin')" class="text-purple-600">${t('adminPanel')}</button>` : ''}
                     <button onclick="logout()" class="text-red-600">${t('logout')}</button>
                 ` : `
-                    <button onclick="navigate('login')" class="text-emerald-600 font-medium">${t('login')}</button>
-                    <button onclick="navigate('register')" class="bg-emerald-600 text-white px-3 py-1 rounded-lg">${t('register')}</button>
+                    <button onclick="navigate('login')" class="text-emerald-600">${t('login')}</button>
+                    <button onclick="navigate('register')" class="bg-emerald-600 text-white px-3 py-1 rounded">${t('register')}</button>
                 `}
             </div>
         </nav>`;
@@ -210,48 +154,32 @@
     // ========== PAGES ==========
     async function HomePage() {
         try { allMeds = await api('/Medications'); } catch(e) { allMeds = []; }
-        return `<div class="w-full px-4 py-8 max-w-7xl mx-auto">
-            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-6 md:p-8 text-white mb-8 text-center">
-                <h1 class="text-3xl md:text-4xl font-bold mb-2">${t('heroTitle')}</h1>
-                <p class="mb-4 text-sm md:text-base">${t('heroDesc')}</p>
-                <div class="relative max-w-md mx-auto">
-                    <input type="text" id="searchHome" placeholder="${t('searchPlaceholder')}" class="w-full px-4 py-2 rounded-full text-black">
-                    <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
-                </div>
+        return `<div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl p-8 text-white mb-8 text-center">
+                <h1 class="text-4xl font-bold mb-2">${t('heroTitle')}</h1>
+                <p class="mb-4">${t('heroDesc')}</p>
+                <div class="relative max-w-md mx-auto"><input type="text" id="searchHome" placeholder="${t('searchPlaceholder')}" class="w-full px-4 py-2 rounded-full text-black"><i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i></div>
             </div>
-            <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white border-r-4 border-emerald-500 pr-3">${t('medDirectory')}</h2>
-            <div id="medGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">${t('medDirectory')}</h2>
+            <div id="medGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>`;
     }
 
     function LoginPage() {
-        return `<div class="min-h-[80vh] flex items-center justify-center p-4">
+        return `<div class="min-h-screen flex items-center justify-center p-4">
             <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-md">
                 <div class="text-center"><i class="fa-solid fa-heartbeat text-emerald-600 text-5xl"></i><h2 class="text-2xl font-bold mt-2 text-gray-800 dark:text-white">${t('loginTitle')}</h2></div>
-                <form onsubmit="handleLogin(event)">
-                    <input id="email" type="email" placeholder="${t('email')}" class="w-full p-2 border rounded mt-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
-                    <input id="pass" type="password" placeholder="${t('password')}" class="w-full p-2 border rounded mt-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
-                    <button type="submit" class="w-full bg-emerald-600 text-white p-2 rounded mt-4 font-bold hover:bg-emerald-700 transition">${t('login')}</button>
-                </form>
-                <p class="text-center mt-4 text-gray-600 dark:text-gray-400">${t('noAccount')} <button onclick="navigate('register')" class="text-emerald-600 font-bold">${t('register')}</button></p>
-               
+                <form onsubmit="handleLogin(event)"><input id="email" type="email" placeholder="${t('email')}" class="w-full p-2 border rounded mt-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required><input id="pass" type="password" placeholder="${t('password')}" class="w-full p-2 border rounded mt-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required><button type="submit" class="w-full bg-emerald-600 text-white p-2 rounded mt-4 font-bold">${t('login')}</button></form>
+                <p class="text-center mt-4 text-gray-600 dark:text-gray-400">${t('noAccount')} <button onclick="navigate('register')" class="text-emerald-600">${t('register')}</button></p>
+                <p class="text-center text-xs text-gray-400 mt-3">admin@dawaee.com / Admin123!</p>
             </div>
         </div>`;
     }
 
     function RegisterPage() {
-        return `<div class="min-h-[80vh] flex items-center justify-center p-4">
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-md">
-                <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white">${t('registerTitle')}</h2>
-                <form onsubmit="handleRegister(event)">
-                    <input id="fname" placeholder="${t('firstName')}" class="w-full p-2 border rounded mt-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
-                    <input id="lname" placeholder="${t('lastName')}" class="w-full p-2 border rounded mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
-                    <input id="remail" type="email" placeholder="${t('email')}" class="w-full p-2 border rounded mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
-                    <input id="rpass" type="password" placeholder="${t('password')}" class="w-full p-2 border rounded mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
-                    <textarea id="rdiseases" placeholder="${t('diseases')}" class="w-full p-2 border rounded mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="2"></textarea>
-                    <button type="submit" class="w-full bg-emerald-600 text-white p-2 rounded mt-4 font-bold hover:bg-emerald-700 transition">${t('register')}</button>
-                </form>
-            </div>
+        return `<div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-md"><h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white">${t('registerTitle')}</h2>
+            <form onsubmit="handleRegister(event)"><input id="fname" placeholder="${t('firstName')}" class="w-full p-2 border rounded mt-3 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required><input id="lname" placeholder="${t('lastName')}" class="w-full p-2 border rounded mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required><input id="remail" type="email" placeholder="${t('email')}" class="w-full p-2 border rounded mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required><input id="rpass" type="password" placeholder="${t('password')}" class="w-full p-2 border rounded mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required><textarea id="rdiseases" placeholder="${t('diseases')}" class="w-full p-2 border rounded mt-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="2"></textarea><button type="submit" class="w-full bg-emerald-600 text-white p-2 rounded mt-4 font-bold">${t('register')}</button></form></div>
         </div>`;
     }
 
@@ -264,88 +192,48 @@
         const totalCount = schedules.length;
         const progress = totalCount > 0 ? (takenCount / totalCount) * 100 : 0;
         
-        return `<div class="w-full px-4 py-8 max-w-7xl mx-auto">
+        return `<div class="max-w-6xl mx-auto px-4 py-8">
             <h1 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">${t('welcome')}, ${currentUser?.firstName || ''} 👋</h1>
-            <button onclick="showAddScheduleModal()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg mb-4 font-bold hover:bg-emerald-700 transition shadow-md">+ ${t('addToSchedule')}</button>
+            <button onclick="showAddScheduleModal()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg mb-4 font-bold">+ ${t('addToSchedule')}</button>
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="md:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
-                    <div class="flex justify-between items-center mb-3">
-                        <h2 class="font-bold text-gray-800 dark:text-white">📋 ${t('dailySchedule')}</h2>
-                        <span class="text-sm text-gray-500">${totalCount} دواء</span>
-                    </div>
+                    <div class="flex justify-between items-center mb-3"><h2 class="font-bold">${t('dailySchedule')}</h2><span class="text-sm text-gray-500">${totalCount} دواء</span></div>
                     <div id="schedulesList">
-                        ${schedules.length === 0 ? '<p class="text-gray-500 dark:text-gray-400 text-center py-8">📅 لا توجد مواعيد اليوم. اضف موعد جديد!</p>' : schedules.map((s) => `<div class="schedule-item flex justify-between items-center p-3 border-b dark:border-gray-700">
-                            <div class="flex items-center gap-3 flex-1">
-                                <button onclick="toggleTaken(${s.id}, ${s.isTaken})" class="w-8 h-8 rounded-full flex items-center justify-center transition ${s.isTaken ? 'bg-green-500 text-white' : 'border-2 border-gray-400 dark:border-gray-500 hover:border-green-500'}">
+                        ${schedules.length === 0 ? '<p class="text-gray-500 text-center py-8">لا توجد مواعيد اليوم</p>' : schedules.map((s) => `<div class="flex justify-between items-center p-3 border-b dark:border-gray-700">
+                            <div class="flex items-center gap-3">
+                                <button onclick="toggleTaken(${s.id}, ${s.isTaken})" class="w-8 h-8 rounded-full flex items-center justify-center transition ${s.isTaken ? 'bg-green-500 text-white' : 'border-2 border-gray-400'}">
                                     ${s.isTaken ? '✓' : ''}
                                 </button>
-                                <div class="flex-1">
-                                    <span class="font-bold text-gray-800 dark:text-white ${s.isTaken ? 'line-through text-gray-500' : ''}">${s.medicationNameAr}</span><br>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">🕐 ${new Date(s.scheduledTime).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</span>
-                                </div>
-                                <button onclick="deleteSchedule(${s.id})" class="text-red-500 hover:text-red-700 transition"><i class="fa-solid fa-trash"></i></button>
+                                <div><span class="font-bold ${s.isTaken ? 'line-through text-gray-500' : ''}">${s.medicationNameAr}</span><br><span class="text-sm text-gray-500">${new Date(s.scheduledTime).toLocaleTimeString()}</span></div>
                             </div>
+                            <button onclick="deleteSchedule(${s.id})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
                         </div>`).join('')}
                     </div>
                 </div>
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
-                    <h2 class="font-bold mb-3 text-gray-800 dark:text-white">📊 ${t('weeklyReport')}</h2>
-                    <div class="mb-4">
-                        <div class="flex justify-between mb-2"><span class="text-gray-700 dark:text-gray-300">${t('adherence')}</span><span class="text-emerald-600 font-bold">${Math.round(progress)}%</span></div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3"><div class="bg-emerald-600 h-3 rounded-full transition-all duration-500" style="width:${progress}%"></div></div>
-                    </div>
-                    <div class="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                        <span class="text-3xl font-bold text-gray-800 dark:text-white">${takenCount}/${totalCount}</span><br>
-                        <span class="text-gray-600 dark:text-gray-400">💊 ${t('medsTaken')}</span>
-                    </div>
+                    <h2 class="font-bold mb-3">📊 ${t('weeklyReport')}</h2>
+                    <div class="mb-4"><div class="flex justify-between mb-2"><span>${t('adherence')}</span><span class="text-emerald-600 font-bold">${Math.round(progress)}%</span></div><div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-emerald-600 h-3 rounded-full" style="width:${progress}%"></div></div></div>
+                    <div class="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg"><span class="text-3xl font-bold">${takenCount}/${totalCount}</span><br><span>💊 ${t('medsTaken')}</span></div>
                 </div>
             </div>
         </div>`;
     }
 
     window.toggleTaken = async (id, current) => {
-        try { 
-            await api('/dashboard/schedules/toggle', { method: 'PUT', body: JSON.stringify({ scheduleId: id, isTaken: !current }) }); 
-            render(); 
-            showToast(current ? '✅ تم إلغاء التحديد' : '✅ تم تسجيل تناول الدواء');
-        } catch(e) { showToast('❌ خطأ', 'error'); }
+        try { await api('/dashboard/schedules/toggle', { method: 'PUT', body: JSON.stringify({ scheduleId: id, isTaken: !current }) }); render(); showToast(current ? 'تم إلغاء' : 'تم التسجيل'); } catch(e) { showToast('خطأ', 'error'); }
     };
 
     window.deleteSchedule = async (id) => {
-        if(confirm('🗑️ هل أنت متأكد من حذف هذا الموعد؟')) {
-            try { 
-                await api(`/dashboard/schedules/${id}`, { method: 'DELETE' }); 
-                render(); 
-                showToast('✅ تم حذف الموعد');
-            } catch(e) { showToast('❌ خطأ في الحذف', 'error'); }
-        }
+        if(confirm('تأكيد الحذف؟')) { try { await api(`/dashboard/schedules/${id}`, { method: 'DELETE' }); render(); showToast('تم الحذف'); } catch(e) { showToast('خطأ', 'error'); } }
     };
 
     window.showAddScheduleModal = async () => {
-        try { 
-            allMeds = await api('/Medications'); 
-            if (!allMeds || allMeds.length === 0) {
-                showToast('❌ لا توجد أدوية متاحة حالياً', 'error');
-                return;
-            }
-        } catch(e) { 
-            showToast('❌ خطأ في تحميل الأدوية', 'error');
-            return;
-        }
-        
-        const modal = document.createElement('div'); 
-        modal.className = 'modal';
-        modal.innerHTML = `<div class="modal-content">
-            <h3 class="font-bold mb-3 text-gray-800 dark:text-white">➕ ${t('addToSchedule')}</h3>
-            <select id="medId" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 mb-3">
-                <option value="">-- ${t('selectMedication')} --</option>
-                ${allMeds.map(m => `<option value="${m.id}">💊 ${m.nameAr} - ${m.activeIngredientAr}</option>`).join('')}
-            </select>
-            <input type="time" id="medTime" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 mb-3" value="09:00">
-            <div class="flex gap-2">
-                <button onclick="saveSchedule()" class="flex-1 bg-emerald-600 text-white p-2 rounded font-bold hover:bg-emerald-700 transition">✅ ${t('add')}</button>
-                <button onclick="closeModal()" class="flex-1 bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition">❌ ${t('cancel')}</button>
-            </div>
+        try { allMeds = await api('/Medications'); } catch(e) { showToast('خطأ في تحميل الأدوية', 'error'); return; }
+        const modal = document.createElement('div'); modal.className = 'modal';
+        modal.innerHTML = `<div class="modal-content"><h3 class="font-bold mb-3">➕ ${t('addToSchedule')}</h3>
+            <select id="medId" class="w-full p-2 border rounded mb-3 dark:bg-gray-700">${allMeds.map(m => `<option value="${m.id}">💊 ${m.nameAr}</option>`).join('')}</select>
+            <input type="time" id="medTime" class="w-full p-2 border rounded mb-3 dark:bg-gray-700" value="09:00">
+            <div class="flex gap-2"><button onclick="saveSchedule()" class="flex-1 bg-emerald-600 text-white p-2 rounded font-bold">✅ ${t('add')}</button><button onclick="closeModal()" class="flex-1 bg-gray-500 text-white p-2 rounded">❌ ${t('cancel')}</button></div>
         </div>`;
         document.body.appendChild(modal);
     };
@@ -353,88 +241,54 @@
     window.saveSchedule = async () => {
         const medId = document.getElementById('medId').value;
         const time = document.getElementById('medTime').value;
-        if (!medId || !time) { 
-            showToast('⚠️ يرجى اختيار الدواء والوقت', 'error'); 
-            return;
-        }
+        if (!medId || !time) { showToast('اختر الدواء والوقت', 'error'); return; }
         const [h, m] = time.split(':');
-        const date = new Date(); 
-        date.setHours(parseInt(h), parseInt(m), 0, 0);
-        try { 
-            await api('/dashboard/schedules', { method: 'POST', body: JSON.stringify({ medicationId: parseInt(medId), scheduledTime: date.toISOString() }) }); 
-            closeModal(); 
-            render(); 
-            showToast('✅ تم إضافة الموعد بنجاح');
-        } catch(e) { 
-            showToast('❌ خطأ في الإضافة', 'error'); 
-        }
+        const date = new Date(); date.setHours(parseInt(h), parseInt(m), 0, 0);
+        try { await api('/dashboard/schedules', { method: 'POST', body: JSON.stringify({ medicationId: parseInt(medId), scheduledTime: date.toISOString() }) }); closeModal(); render(); showToast('✅ تم الإضافة'); } catch(e) { showToast('❌ خطأ', 'error'); }
     };
 
     async function AdminPage() {
         let patients = [], meds = [];
         try { patients = await api('/admin/patients'); } catch(e) {}
         try { meds = await api('/admin/medications'); } catch(e) {}
-        return `<div class="w-full px-4 py-8 max-w-7xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">👑 ${t('adminPanel')}</h1>
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow overflow-x-auto">
-                <div class="flex justify-between items-center mb-3"><h2 class="font-bold text-gray-800 dark:text-white">👥 ${t('patients')}</h2></div>
-                ${patients.map(p => `<div class="flex justify-between items-center p-2 border-b dark:border-gray-700 flex-wrap gap-2"><span class="text-gray-800 dark:text-white font-medium">${p.name}</span><span class="text-gray-600 dark:text-gray-400 text-sm">${p.email}</span><button onclick="deletePatient(${p.id})" class="text-red-500 hover:text-red-700">🗑️</button></div>`).join('')}
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow overflow-x-auto">
-                <div class="flex justify-between items-center flex-wrap gap-2 mb-3"><h2 class="font-bold text-gray-800 dark:text-white">💊 ${t('medications')}</h2><button onclick="showAddMedModal()" class="bg-emerald-600 text-white px-3 py-1 rounded text-sm hover:bg-emerald-700 transition">+ ${t('addMedication')}</button></div>
-                ${meds.map(m => `<div class="flex justify-between items-center p-2 border-b dark:border-gray-700"><span class="text-gray-800 dark:text-white">${m.nameAr}</span><button onclick="deleteMedication(${m.id})" class="text-red-500 hover:text-red-700">🗑️</button></div>`).join('')}
-            </div>
+        return `<div class="max-w-6xl mx-auto px-4 py-8"><h1 class="text-2xl font-bold mb-4">👑 ${t('adminPanel')}</h1>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow"><h2 class="font-bold mb-2">👥 ${t('patients')}</h2>${patients.map(p => `<div class="flex justify-between items-center p-2 border-b"><span>${p.name}</span><span>${p.email}</span><button onclick="deletePatient(${p.id})" class="text-red-500">🗑️</button></div>`).join('')}</div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow"><div class="flex justify-between"><h2 class="font-bold mb-2">💊 ${t('medications')}</h2><button onclick="showAddMedModal()" class="bg-emerald-600 text-white px-3 py-1 rounded">+ ${t('addMedication')}</button></div>${meds.map(m => `<div class="flex justify-between items-center p-2 border-b"><span>${m.nameAr}</span><button onclick="deleteMedication(${m.id})" class="text-red-500">🗑️</button></div>`).join('')}</div>
         </div>`;
     }
 
-    window.deletePatient = async (id) => { if(confirm('تأكيد حذف المريض؟')){ await api(`/admin/patients/${id}`, { method: 'DELETE' }); render(); showToast('✅ تم حذف المريض'); } };
-    window.deleteMedication = async (id) => { if(confirm('تأكيد حذف الدواء؟')){ await api(`/admin/medications/${id}`, { method: 'DELETE' }); render(); showToast('✅ تم حذف الدواء'); } };
+    window.deletePatient = async (id) => { if(confirm('تأكيد؟')){ await api(`/admin/patients/${id}`, { method: 'DELETE' }); render(); showToast('تم الحذف'); } };
+    window.deleteMedication = async (id) => { if(confirm('تأكيد؟')){ await api(`/admin/medications/${id}`, { method: 'DELETE' }); render(); showToast('تم الحذف'); } };
     
     window.showAddMedModal = () => {
         const modal = document.createElement('div'); modal.className = 'modal';
-        modal.innerHTML = `<div class="modal-content"><h3 class="font-bold mb-3 text-gray-800 dark:text-white">➕ ${t('addMedication')}</h3>
-            <input id="medNameAr" placeholder="${t('nameAr')}" class="w-full p-2 border rounded mb-2 dark:bg-gray-700 dark:border-gray-600">
-            <input id="medActive" placeholder="${t('activeIngredient')}" class="w-full p-2 border rounded mb-2 dark:bg-gray-700 dark:border-gray-600">
-            <textarea id="medDesc" placeholder="${t('description')}" class="w-full p-2 border rounded mb-2 dark:bg-gray-700 dark:border-gray-600" rows="2"></textarea>
-            <textarea id="medWarn" placeholder="${t('warnings')}" class="w-full p-2 border rounded mb-2 dark:bg-gray-700 dark:border-gray-600" rows="2"></textarea>
-            <select id="medDanger" class="w-full p-2 border rounded mb-3 dark:bg-gray-700 dark:border-gray-600"><option value="low">🟢 منخفض</option><option value="medium">🟠 متوسط</option><option value="high">🔴 عالي</option></select>
-            <button onclick="saveMedication()" class="w-full bg-emerald-600 text-white p-2 rounded font-bold hover:bg-emerald-700 transition">✅ ${t('save')}</button></div>`;
+        modal.innerHTML = `<div class="modal-content"><h3 class="font-bold mb-3">➕ ${t('addMedication')}</h3>
+            <input id="medNameAr" placeholder="${t('nameAr')}" class="w-full p-2 border rounded mb-2"><input id="medActive" placeholder="${t('activeIngredient')}" class="w-full p-2 border rounded mb-2"><textarea id="medDesc" placeholder="${t('description')}" class="w-full p-2 border rounded mb-2" rows="2"></textarea><textarea id="medWarn" placeholder="${t('warnings')}" class="w-full p-2 border rounded mb-2" rows="2"></textarea><select id="medDanger" class="w-full p-2 border rounded mb-3"><option value="low">🟢 منخفض</option><option value="medium">🟠 متوسط</option><option value="high">🔴 عالي</option></select>
+            <button onclick="saveMedication()" class="w-full bg-emerald-600 text-white p-2 rounded font-bold">✅ ${t('save')}</button></div>`;
         document.body.appendChild(modal);
     };
     
     window.saveMedication = async () => {
         await api('/admin/medications', { method: 'POST', body: JSON.stringify({ nameAr: document.getElementById('medNameAr').value, nameEn: document.getElementById('medNameAr').value, activeIngredientAr: document.getElementById('medActive').value, activeIngredientEn: document.getElementById('medActive').value, descriptionAr: document.getElementById('medDesc').value, descriptionEn: document.getElementById('medDesc').value, warningsAr: document.getElementById('medWarn').value, warningsEn: document.getElementById('medWarn').value, dangerLevel: document.getElementById('medDanger').value }) });
-        closeModal(); render(); showToast('✅ تم إضافة الدواء');
+        closeModal(); render(); showToast('✅ تم الإضافة');
     };
 
-    // ========== SEARCH FUNCTION ==========
+    // ========== SEARCH ==========
     async function updateSearch() {
         const search = document.getElementById('searchHome')?.value || '';
         const meds = search ? allMeds.filter(m => m.nameAr.includes(search) || m.activeIngredientAr.includes(search)) : allMeds;
         const grid = document.getElementById('medGrid');
-        if (grid) grid.innerHTML = meds.map(m => `<div class="med-card bg-white dark:bg-gray-800 rounded-xl p-4 shadow hover:shadow-md transition">
-            <h3 class="font-bold text-emerald-700 dark:text-emerald-400 text-lg">💊 ${m.nameAr}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">🔬 ${m.activeIngredientAr}</p>
-            <p class="text-sm mt-2 text-gray-700 dark:text-gray-300">${(m.descriptionAr || '').substring(0, 100)}</p>
-            <div class="mt-2 p-2 rounded ${m.dangerLevel === 'high' ? 'bg-red-100 dark:bg-red-900/30' : m.dangerLevel === 'medium' ? 'bg-orange-100 dark:bg-orange-900/30' : 'bg-green-100 dark:bg-green-900/30'}">
-                <span class="text-xs font-bold text-gray-800 dark:text-white">⚠️ ${t('interactionWarning')}</span>
-                <p class="text-xs text-gray-700 dark:text-gray-300">${(m.warningsAr || '').substring(0, 80)}</p>
-            </div>
-        </div>`).join('');
+        if (grid) grid.innerHTML = meds.map(m => `<div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow"><h3 class="font-bold text-emerald-700">💊 ${m.nameAr}</h3><p class="text-sm text-gray-600">🔬 ${m.activeIngredientAr}</p><p class="text-sm mt-2">${(m.descriptionAr || '').substring(0, 80)}</p><div class="mt-2 p-2 rounded ${m.dangerLevel === 'high' ? 'bg-red-100' : m.dangerLevel === 'medium' ? 'bg-orange-100' : 'bg-green-100'}"><span class="text-xs font-bold">⚠️ ${t('interactionWarning')}</span><p class="text-xs">${(m.warningsAr || '').substring(0, 60)}</p></div></div>`).join('');
     }
 
-    // ========== SMART CHATBOT ==========
+    // ========== CHATBOT ==========
     let chatOpen = false;
     let chatMessages = [];
-    let isTyping = false;
 
     window.toggleChat = () => {
         chatOpen = !chatOpen;
         const win = document.getElementById('chatbotWindow');
-        if (win) {
-            if (chatOpen) win.classList.remove('hidden-chat');
-            else win.classList.add('hidden-chat');
-        }
+        if (win) chatOpen ? win.classList.remove('hidden-chat') : win.classList.add('hidden-chat');
     };
 
     window.sendChatMessage = async () => {
@@ -443,18 +297,9 @@
         if (!msg) return;
         addChatMessage(msg, 'user');
         input.value = '';
-        isTyping = true;
-        renderChatMessages();
         
         const token = localStorage.getItem('token');
-        if (!token) {
-            setTimeout(() => {
-                isTyping = false;
-                addChatMessage('📝 يرجى تسجيل الدخول أولاً للاستفادة من جميع خدمات المساعد الطبي.', 'bot');
-                renderChatMessages();
-            }, 500);
-            return;
-        }
+        if (!token) { addChatMessage('يرجى تسجيل الدخول أولاً', 'bot'); return; }
         
         try {
             const res = await fetch(`${API_URL}/chatbot/chat`, {
@@ -463,102 +308,36 @@
                 body: JSON.stringify({ messages: [{ role: 'user', message: msg }] })
             });
             const data = await res.json();
-            isTyping = false;
-            addChatMessage(data.reply || getSmartMedicalResponse(msg), 'bot');
-            renderChatMessages();
-        } catch(e) {
-            isTyping = false;
-            addChatMessage(getSmartMedicalResponse(msg), 'bot');
-            renderChatMessages();
-        }
+            addChatMessage(data.reply || 'عذراً، لم أستطع الرد', 'bot');
+        } catch(e) { addChatMessage('عذراً، حدث خطأ', 'bot'); }
     };
 
-    function getSmartMedicalResponse(question) {
-        const q = question.toLowerCase();
-        
-        const emergencies = ['طوارئ', 'اسعاف', 'نزيف', 'قلب', 'صدر', 'تنفس', 'وعي', 'اغماء', 'حساسية شديدة', 'اختناق'];
-        for (let e of emergencies) {
-            if (q.includes(e)) return "🚨 *حالة طارئة!* 🚨\n\nهذه أعراض خطيرة! يرجى التوجه فوراً لأقرب مستشفى أو الاتصال بالإسعاف (997). لا تنتظر!";
-        }
-        
-        if (q.includes('برد') || q.includes('زكام') || q.includes('رشح') || q.includes('اعراض برد')) {
-            return "🤧 *نزلات البرد والإنفلونزا*\n\n💊 نصائح: راحة تامة، سوائل دافئة، خافض حرارة، غرغرة بالماء والملح.\n\n🏥 راجع الطبيب إذا استمرت الأعراض أكثر من 5 أيام.\n👨‍⚕️ التخصص: طب الأسرة أو الباطنة";
-        }
-        
-        if (q.includes('صداع') || q.includes('راسي') || q.includes('رأس')) {
-            return "🤕 *الصداع*\n\n💊 للصداع البسيط: راحة، شرب ماء، مسكن مثل باراسيتامول.\n⚠️ راجع الطبيب فوراً إذا كان مصاحباً لحمى أو تيبس بالرقبة.\n👨‍⚕️ التخصص: طب الأعصاب";
-        }
-        
-        if (q.includes('حرارة') || q.includes('حمى') || q.includes('سخونة')) {
-            return "🌡️ *ارتفاع الحرارة*\n\n• 37.5-38.5: راحة، سوائل، خافض حرارة\n• 38.6-39.5: كمادات ماء فاتر، استمرار خافض حرارة\n• فوق 39.5: توجه للمستشفى فوراً\n\n👨‍⚕️ التخصص: طب الأسرة أو الباطنة";
-        }
-        
-        if (q.includes('معدة') || q.includes('بطن') || q.includes('قولون')) {
-            return "🤢 *آلام المعدة*\n\n💡 نصائح: مضادات الحموضة، النعناع، الزنجبيل، تجنب الأطعمة الدسمة.\n⚠️ راجع طبيب الجهاز الهضمي إذا كان الألم شديداً أو مستمراً.";
-        }
-        
-        if (q.includes('ضغط') || q.includes('ضغط الدم')) {
-            return "❤️ *ضغط الدم*\n\n📊 طبيعي: أقل من 120/80\n🟡 مرتفع قليلاً: 120-139/80-89\n🔴 مرتفع: 140/90 أو أكثر\n\n💡 نصائح: قلل الملح، مارس الرياضة، التزم بالأدوية.\n👨‍⚕️ التخصص: أمراض القلب أو الباطنة";
-        }
-        
-        if (q.includes('سكري') || q.includes('السكر')) {
-            return "🩸 *مرض السكري*\n\n📊 سكر صائم طبيعي: 70-100 mg/dL\n💡 نصائح: نظام غذائي متوازن، مراقبة السكر، أدوية منتظمة، رياضة.\n⚠️ عند هبوط السكر تناول مصدر سكر فوراً.\n👨‍⚕️ التخصص: الغدد الصماء والسكري";
-        }
-        
-        if (allMeds.length > 0) {
-            const foundMed = allMeds.find(m => q.includes(m.nameAr.toLowerCase()) || q.includes(m.activeIngredientAr.toLowerCase()));
-            if (foundMed) {
-                return `📋 *${foundMed.nameAr}*\n\n🔬 المادة الفعالة: ${foundMed.activeIngredientAr}\n💊 الاستخدام: ${foundMed.descriptionAr}\n⚠️ تحذير: ${foundMed.warningsAr}`;
-            }
-        }
-        
-        if (q.includes('مرحب') || q.includes('السلام')) {
-            return "وعليكم السلام ورحمة الله! 👋\n\nأنا دواءي، مساعدك الطبي الذكي.\n💡 يمكنني مساعدتك في:\n• معلومات عن الأدوية\n• تحليل الأعراض\n• نصائح طبية\n\nكيف أقدر أساعدك اليوم؟";
-        }
-        
-        if (q.includes('اسمك')) return "اسمي *دواءي* 🩺، مساعدك الطبي الذكي. أنا هنا لخدمتك!";
-        if (q.includes('كيفك')) return "أنا بخير وسعادة، الحمد لله! 🎉 شكراً لسؤالك. كيف حال صحتك اليوم؟";
-        if (q.includes('شكر')) return "العفو! هذا واجبي 😊 هل هناك شيء آخر يمكنني مساعدتك فيه؟";
-        
-        return "👋 *مرحباً! أنا دواءي*\n\nيمكنني مساعدتك في:\n🔹 تحليل الأعراض (مثال: عندي برد، صداع، حرارة)\n🔹 معلومات عن الأدوية (مثال: معلومة عن بروفين)\n🔹 نصائح طبية (مثال: نصائح لمرضى الضغط)\n\n⚠️ تذكر: أنا مساعد آلي، للحالات الطارئة اتصل بالإسعاف (997)";
-    }
-
     function addChatMessage(text, sender) {
-        chatMessages.push({ text, sender, time: new Date() });
+        chatMessages.push({ text, sender });
         renderChatMessages();
     }
 
     function renderChatMessages() {
         const container = document.getElementById('chatMessagesContainer');
         if (!container) return;
-        let html = '';
-        chatMessages.forEach(msg => {
-            html += `<div class="${msg.sender === 'user' ? 'message-user' : 'message-bot'}">${msg.text.replace(/\*/g, '').replace(/\n/g, '<br>')}</div>`;
-        });
-        if (isTyping) {
-            html += `<div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
-        }
-        container.innerHTML = html;
+        container.innerHTML = chatMessages.map(msg => `<div class="${msg.sender === 'user' ? 'message-user' : 'message-bot'}">${msg.text}</div>`).join('');
         container.scrollTop = container.scrollHeight;
     }
 
     function ChatbotComponent() {
         return `
             <div id="chatbotContainer">
-                <button onclick="toggleChat()" class="chatbot-btn"><i class="fa-solid fa-comment-medical text-2xl"></i></button>
-                <div id="chatbotWindow" class="chatbot-window hidden-chat">
-                    <div class="chat-header"><span><i class="fa-solid fa-robot ml-2"></i> ${t('botTitle')}</span><button onclick="toggleChat()" class="text-white hover:bg-white/20 rounded-full p-1 transition"><i class="fa-solid fa-times"></i></button></div>
-                    <div id="chatMessagesContainer" class="chat-messages"></div>
-                    <div class="chat-input-area"><input type="text" id="chatInput" placeholder="${t('botPlaceholder')}" class="chat-input" onkeypress="if(event.key==='Enter') sendChatMessage()"><button onclick="sendChatMessage()" class="chat-send"><i class="fa-solid fa-paper-plane"></i></button></div>
+                <button onclick="toggleChat()" class="fixed bottom-6 right-6 w-14 h-14 bg-emerald-600 text-white rounded-full shadow-lg flex items-center justify-center z-50"><i class="fa-solid fa-comment-medical text-2xl"></i></button>
+                <div id="chatbotWindow" class="fixed bottom-24 right-6 w-96 h-[500px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl hidden flex flex-col z-50 border">
+                    <div class="bg-emerald-600 text-white p-3 rounded-t-2xl flex justify-between"><span><i class="fa-solid fa-robot mr-2"></i> ${t('botTitle')}</span><button onclick="toggleChat()"><i class="fa-solid fa-times"></i></button></div>
+                    <div id="chatMessagesContainer" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
+                    <div class="p-3 border-t flex gap-2"><input id="chatInput" placeholder="${t('botPlaceholder')}" class="flex-1 p-2 border rounded-full dark:bg-gray-700"><button onclick="sendChatMessage()" class="bg-emerald-600 text-white w-10 h-10 rounded-full"><i class="fa-solid fa-paper-plane"></i></button></div>
                 </div>
             </div>
         `;
     }
 
-    function initChat() {
-        chatMessages = [{ text: t('botWelcome'), sender: 'bot', time: new Date() }];
-        renderChatMessages();
-    }
+    function initChat() { chatMessages = [{ text: t('botWelcome'), sender: 'bot' }]; renderChatMessages(); }
 
     // ========== MAIN RENDER ==========
     async function render() {
@@ -573,14 +352,9 @@
         document.getElementById('root').innerHTML = Navbar() + `<main>${content}</main>` + ChatbotComponent();
         if (currentPage === 'home') { await updateSearch(); document.getElementById('searchHome')?.addEventListener('input', updateSearch); }
         initChat();
-        try { allMeds = await api('/Medications'); } catch(e) {}
     }
 
-    // Apply theme on load
-    if (currentTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
-    }
+    if (currentTheme === 'dark') document.documentElement.classList.add('dark');
     render();
 </script>
 </body>
