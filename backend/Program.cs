@@ -132,9 +132,28 @@ using (var scope = app.Services.CreateScope())
     try
     {
         Console.WriteLine("🔄 Ensuring database is ready...");
-        db.Database.EnsureCreated();
-        
-        if (!db.Medications.Any())
+       db.Database.EnsureCreated();
+Console.WriteLine($"✅ Tables exist. Users count: {db.Users.Count()}, Meds: {db.Medications.Count()}");
+
+if (!db.Users.Any(u => u.Email == "admin@dawaee.com"))
+{
+    Console.WriteLine("🌱 Seeding admin user...");
+    db.Users.AddRange(new User
+    {
+        FirstName = "Admin", LastName = "Dawaee", Email = "admin@dawaee.com",
+        PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+        Role = "Admin", CreatedAt = DateTime.UtcNow
+    }, new User
+    {
+        FirstName = "Test", LastName = "Patient", Email = "patient@test.com",
+        PasswordHash = BCrypt.Net.BCrypt.HashPassword("Patient123!"),
+        Role = "Patient", CreatedAt = DateTime.UtcNow
+    });
+    db.SaveChanges();
+    Console.WriteLine("✅ Users seeded!");
+}
+
+if (!db.Medications.Any())
         {
             Console.WriteLine("🌱 Seeding medications...");
             var meds = new List<Medication>();
