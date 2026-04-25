@@ -24,19 +24,3 @@ x64/
 x86/
 build/
 bld/
-
-# Visual Studio
-.vs/
-.vscode/
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
-
-# dotnet
-project.lock.json
-project.fragment.lock.json
-artifacts/
-
-# Railway
-.railway/

@@ -44,25 +44,23 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Database - PostgreSQL
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-if (!string.IsNullOrEmpty(databaseUrl))
-{
-    var uri = new Uri(databaseUrl);
-    var userInfo = uri.UserInfo.Split(':');
-    connectionString = $"Host={uri.Host};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};Port={uri.Port};SSL Mode=Require;Trust Server Certificate=true";
-    Console.WriteLine("📦 Using Railway PostgreSQL");
-}
-else
-{
-    Console.WriteLine("📦 Using Local PostgreSQL");
-}
+// Database - Auto detect environment (Local or Railway)
+var isRailway = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT"));
+var connectionString = isRailway 
+    ? builder.Configuration.GetConnectionString("RailwayConnection")
+    : builder.Configuration.GetConnectionString("LocalConnection");
+
+Console.WriteLine($"🚀 Running in {(isRailway ? "RAILWAY (Production)" : "LOCAL (Development)")} mode");
+Console.WriteLine($"📡 Connecting to database...");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString, npgsqlOptions =>
+    {
+        npgsqlOptions.EnableRetryOnFailure(3);
+        npgsqlOptions.CommandTimeout(60);
+    }));
 
-// CORS - مهم للشات بوت
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -91,7 +89,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add HttpClient for Chatbot
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
@@ -109,16 +106,21 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Health check endpoint
+// Health check endpoints
 app.MapGet("/", () => Results.Redirect("/swagger"));
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+app.MapGet("/health", () => Results.Ok(new { 
+    status = "healthy", 
+    environment = isRailway ? "railway" : "local",
+    timestamp = DateTime.UtcNow 
+}));
 
-// Seed database
+// Migrate and seed database
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     try
     {
+        Console.WriteLine("🔄 Ensuring database is ready...");
         db.Database.EnsureCreated();
         
         if (!db.Medications.Any())
@@ -141,7 +143,7 @@ using (var scope = app.Services.CreateScope())
                 });
             }
             db.Medications.AddRange(meds);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             
             if (!db.Users.Any(u => u.Email == "admin@dawaee.com"))
             {
@@ -166,7 +168,7 @@ using (var scope = app.Services.CreateScope())
                     CreatedAt = DateTime.UtcNow
                 };
                 db.Users.Add(patient);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
             Console.WriteLine($"✅ Seeded {meds.Count} medications");
         }
@@ -178,24 +180,32 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Database error: {ex.Message}");
+        if (!isRailway)
+        {
+            Console.WriteLine("💡 Make sure PostgreSQL is running locally: sudo service postgresql start");
+        }
     }
 }
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+var url = isRailway ? $"http://0.0.0.0:{port}" : $"http://localhost:{port}";
+
 Console.WriteLine("\n╔════════════════════════════════════════════════════╗");
-Console.WriteLine("║           🚀 DAWAEE BACKEND RUNNING              ║");
+Console.WriteLine($"║           🚀 DAWAEE BACKEND RUNNING              ║");
 Console.WriteLine("╠════════════════════════════════════════════════════╣");
+Console.WriteLine($"║  Environment: {(isRailway ? "🌐 RAILWAY" : "💻 LOCAL")}                              ║");
 Console.WriteLine($"║  Port: {port}                                            ║");
-Console.WriteLine($"║  Swagger UI: http://localhost:{port}/swagger            ║");
+Console.WriteLine($"║  URL: {url}                                    ║");
+Console.WriteLine($"║  Swagger: {url}/swagger                               ║");
 Console.WriteLine("╠════════════════════════════════════════════════════╣");
 Console.WriteLine("║  👤 LOGIN CREDENTIALS:                             ║");
 Console.WriteLine("║     Admin: admin@dawaee.com / Admin123!            ║");
 Console.WriteLine("║     Patient: patient@test.com / Patient123!        ║");
 Console.WriteLine("╚════════════════════════════════════════════════════╝\n");
 
-app.Run($"http://0.0.0.0:{port}");
+app.Run(url);
 
-// Helper methods
+// Helper methods for seeding
 static string GetMedicationNameAr(int i)
 {
     string[] names = { "بانادول", "بروفين", "أوجمنتين", "سيبروفلوكساسين", "أموكسيسيلين", 
