@@ -94,12 +94,16 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // Configure pipeline
-app.UseSwagger();
-app.UseSwaggerUI(c => 
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dawaee API V1");
-    c.RoutePrefix = "swagger";
-});
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseCors("AllowAll");
 app.UseAuthentication();
@@ -143,7 +147,7 @@ using (var scope = app.Services.CreateScope())
                 });
             }
             db.Medications.AddRange(meds);
-            await db.SaveChangesAsync();
+            db.SaveChanges();
             
             if (!db.Users.Any(u => u.Email == "admin@dawaee.com"))
             {
@@ -168,7 +172,7 @@ using (var scope = app.Services.CreateScope())
                     CreatedAt = DateTime.UtcNow
                 };
                 db.Users.Add(patient);
-                await db.SaveChangesAsync();
+                db.SaveChanges();
             }
             Console.WriteLine($"✅ Seeded {meds.Count} medications");
         }

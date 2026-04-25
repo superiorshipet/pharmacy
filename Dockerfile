@@ -3,12 +3,15 @@ WORKDIR /src
 
 # Copy csproj and restore
 COPY backend/*.csproj backend/
-RUN dotnet restore "backend/DawaeeBackend.csproj" --runtime linux-x64
+RUN dotnet restore "backend/DawaeeBackend.csproj"
 
 # Copy everything and build
 COPY backend/ backend/
 WORKDIR "/src/backend"
-RUN dotnet publish "DawaeeBackend.csproj" -c Release -o /app/publish -r linux-x64 --self-contained false
+RUN dotnet build "DawaeeBackend.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "DawaeeBackend.csproj" -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
