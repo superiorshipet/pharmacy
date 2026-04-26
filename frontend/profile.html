@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ملفي الشخصي — دوائي</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    * { font-family: 'Cairo', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f0fdf4; min-height: 100vh; }
+
+    /* HERO */
+    .hero { background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%); border-radius: 24px; padding: 40px 36px; display: flex; align-items: center; gap: 28px; margin-bottom: 24px; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; top: -50px; left: -50px; width: 220px; height: 220px; background: rgba(255,255,255,0.07); border-radius: 50%; }
+    .hero::after  { content: ''; position: absolute; bottom: -60px; left: 100px; width: 160px; height: 160px; background: rgba(255,255,255,0.04); border-radius: 50%; }
+
+    /* AVATAR */
+    .avatar-wrap { position: relative; flex-shrink: 0; z-index: 1; }
+    .avatar { width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; color: #fff; cursor: pointer; transition: transform 0.2s; position: relative; overflow: hidden; }
+    .avatar:hover { transform: scale(1.06); }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; border-radius: 50%; }
+    .avatar-edit { position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    #avatarInput { display: none; }
+
+    /* CARD */
+    .card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); border: 1px solid #d1fae5; }
+    .card-title { font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-right: 3px solid #059669; padding-right: 10px; }
+
+    /* INFO ROW */
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid #f0fdf4; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { font-size: 13px; color: #6b7280; display: flex; align-items: center; gap: 6px; }
+    .info-value { font-size: 14px; font-weight: 600; color: #111827; }
+
+    /* FORM */
+    .field { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 5px; }
+    input[type=text], input[type=password] {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #d1d5db; border-radius: 10px;
+      font-size: 14px; font-family: 'Cairo', sans-serif; outline: none; transition: border-color 0.2s;
+      background: #f9fafb; color: #111827;
+    }
+    input:focus { border-color: #059669; background: #fff; box-shadow: 0 0 0 3px rgba(5,150,105,0.1); }
+
+    /* PROGRESS */
+    .progress-bg { background: #d1fae5; border-radius: 999px; height: 10px; overflow: hidden; margin: 10px 0 6px; }
+    .progress-fill { height: 10px; border-radius: 999px; background: linear-gradient(90deg, #34d399, #059669); transition: width 1s ease; }
+
+    /* STAT CARD */
+    .stat-card { background: #fff; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.05); border: 1px solid #d1fae5; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 24px; left: 24px; z-index: 9999; padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; animation: slideUp 0.3s ease; }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* DARK MODE */
+    .dark body { background: #111827; }
+    .dark .card { background: #1f2937; border-color: #374151; }
+    .dark .card-title { color: #f9fafb; }
+    .dark .info-row { border-color: #374151; }
+    .dark .info-label { color: #9ca3af; }
+    .dark .info-value { color: #f3f4f6; }
+    .dark label { color: #d1d5db; }
+    .dark input { background: #374151; border-color: #4b5563; color: #f3f4f6; }
+    .dark .stat-card { background: #1f2937; border-color: #374151; }
+    .dark .hero { background: linear-gradient(135deg, #047857, #065f46, #064e3b); }
+
+    @media (max-width: 640px) {
+      .hero { flex-direction: column; text-align: center; padding: 28px 20px; }
+      .two-col { grid-template-columns: 1fr !important; }
+      .three-col { grid-template-columns: 1fr 1fr !important; }
+    }
+  </style>
+</head>
+<body id="bodyEl">
+
+<!-- NAVBAR -->
+<nav class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 px-6 py-3 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
+  <a href="index.html" class="flex items-center gap-2 text-emerald-600 font-bold text-xl no-underline">
+    <i class="fa-solid fa-heartbeat"></i> دوائي
+  </a>
+  <div class="flex items-center gap-3">
+    <button onclick="toggleTheme()" class="text-gray-500 dark:text-gray-300 hover:text-emerald-600 transition" title="تبديل المظهر">
+      <i id="themeIcon" class="fa-solid fa-moon text-lg"></i>
+    </button>
+    <a href="index.html" class="flex items-center gap-2 text-gray-500 dark:text-gray-300 hover:text-emerald-600 text-sm font-medium transition">
+      <i class="fa-solid fa-arrow-right"></i> العودة للرئيسية
+    </a>
+  </div>
+</nav>
+
+<div class="max-w-4xl mx-auto px-4 py-8">
+
+  <!-- HERO CARD -->
+  <div class="hero mb-6">
+    <div class="hero-info flex-1 z-10">
+      <div id="heroName" class="text-3xl font-bold text-white mb-1">جاري التحميل...</div>
+      <div id="heroEmail" class="text-white/80 text-sm mb-3"></div>
+      <div id="heroRole" class="inline-flex items-center gap-2 bg-white/20 text-white px-4 py-1 rounded-full text-sm font-semibold"></div>
+      <div id="heroJoined" class="text-white/60 text-xs mt-3"></div>
+    </div>
+    <div class="avatar-wrap z-10">
+      <div class="avatar" onclick="document.getElementById('avatarInput').click()" title="تغيير الصورة">
+        <span id="avatarInitials"></span>
+        <img id="avatarImg" src="" style="display:none"/>
+      </div>
+      <div class="avatar-edit" onclick="document.getElementById('avatarInput').click()">📷</div>
+      <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatar(event)"/>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid grid-cols-3 gap-4 mb-6 three-col">
+    <div class="stat-card">
+      <div class="text-3xl mb-2">💊</div>
+      <div id="statSchedules" class="text-3xl font-bold text-emerald-600">—</div>
+      <div class="text-xs text-gray-500 mt-1 font-medium">إجمالي المواعيد</div>
+    </div>
+    <div class="stat-card">
+      <div class="text-3xl mb-2">✅</div>
+      <div id="statTaken" class="text-3xl font-bold text-green-600">—</div>
+      <div class="text-xs text-gray-500 mt-1 font-medium">جرعات تم تناولها</div>
+    </div>
+    <div class="stat-card">
+      <div class="text-3xl mb-2">🤖</div>
+      <div id="statChats" class="text-3xl font-bold text-purple-600">—</div>
+      <div class="text-xs text-gray-500 mt-1 font-medium">رسائل المساعد</div>
+    </div>
+  </div>
+
+  <!-- TWO COL GRID -->
+  <div class="grid grid-cols-2 gap-5 mb-5 two-col">
+
+    <!-- ACCOUNT INFO -->
+    <div class="card">
+      <div class="card-title">👤 بيانات الحساب</div>
+      <div class="info-row">
+        <span class="info-value" id="infoEmail">—</span>
+        <span class="info-label"><i class="fa-solid fa-envelope text-emerald-500"></i> البريد</span>
+      </div>
+      <div class="info-row">
+        <span class="info-value" id="infoRole">—</span>
+        <span class="info-label"><i class="fa-solid fa-shield text-emerald-500"></i> الدور</span>
+      </div>
+      <div class="info-row">
+        <span class="info-value" id="infoJoined">—</span>
+        <span class="info-label"><i class="fa-solid fa-calendar text-emerald-500"></i> تاريخ التسجيل</span>
+      </div>
+      <div class="info-row">
+        <span class="info-value" id="infoId">—</span>
+        <span class="info-label"><i class="fa-solid fa-fingerprint text-emerald-500"></i> رقم المستخدم</span>
+      </div>
+    </div>
+
+    <!-- ADHERENCE -->
+    <div class="card">
+      <div class="card-title">📊 الالتزام بالجرعات</div>
+      <div class="flex justify-between text-sm mb-1">
+        <span id="adherenceText" class="text-gray-500">جاري الحساب...</span>
+        <span id="adherencePct" class="font-bold text-emerald-600"></span>
+      </div>
+      <div class="progress-bg">
+        <div class="progress-fill" id="adherenceBar" style="width:0%"></div>
+      </div>
+      <div class="mt-4 grid gap-2">
+        <div class="info-row" style="padding:8px 0">
+          <span class="info-value" id="a1">—</span>
+          <span class="info-label">📋 إجمالي المواعيد</span>
+        </div>
+        <div class="info-row" style="padding:8px 0">
+          <span class="info-value text-green-600" id="a2">—</span>
+          <span class="info-label">✅ تم تناولها</span>
+        </div>
+        <div class="info-row" style="padding:8px 0;border:none">
+          <span class="info-value text-amber-500" id="a3">—</span>
+          <span class="info-label">⏳ متبقية</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT PROFILE FULL WIDTH -->
+  <div class="card">
+    <div class="card-title">✏️ تعديل الملف الشخصي</div>
+    <div class="grid grid-cols-2 gap-4 two-col">
+      <div class="field">
+        <label>الاسم الأول</label>
+        <input type="text" id="editFirst" placeholder="الاسم الأول"/>
+      </div>
+      <div class="field">
+        <label>اسم العائلة</label>
+        <input type="text" id="editLast" placeholder="اسم العائلة"/>
+      </div>
+    </div>
+
+    <div class="border-t border-gray-100 dark:border-gray-700 pt-4 mt-2 mb-4">
+      <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">تغيير كلمة المرور (اختياري)</p>
+      <div class="grid grid-cols-2 gap-4 two-col">
+        <div class="field">
+          <label>كلمة المرور الحالية</label>
+          <input type="password" id="editCurrent" placeholder="أدخل كلمة المرور الحالية"/>
+        </div>
+        <div class="field">
+          <label>كلمة المرور الجديدة</label>
+          <input type="password" id="editNew" placeholder="أدخل كلمة المرور الجديدة"/>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="saveProfile()"
+      class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-3 rounded-xl transition-all duration-200 text-base">
+      💾 حفظ التغييرات
+    </button>
+
+    <div id="profileMsg" style="display:none" class="mt-4 p-3 rounded-xl text-sm font-semibold text-center"></div>
+  </div>
+
+</div>
+
+<script>
+  // ── ENV DETECTION (same as index.html) ──
+  const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+  const RAILWAY_URL  = 'https://pharmacy-production-eea1.up.railway.app';
+  const API          = isProduction ? `${RAILWAY_URL}/api` : 'http://localhost:5000/api';
+
+  const token = localStorage.getItem('token');
+  if (!token) window.location.href = 'index.html';
+
+  // ── THEME ──
+  let theme = localStorage.getItem('theme') || 'light';
+  applyTheme();
+
+  function applyTheme() {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.getElementById('themeIcon').className = 'fa-solid fa-sun text-lg';
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.getElementById('themeIcon').className = 'fa-solid fa-moon text-lg';
+    }
+  }
+
+  function toggleTheme() {
+    theme = theme === 'light' ? 'dark' : 'light';
+    localStorage.setItem('theme', theme);
+    applyTheme();
+  }
+
+  // ── TOAST ──
+  function showToast(msg, type = 'success') {
+    const t = document.createElement('div');
+    t.className = `toast ${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'} text-white`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  // ── LOAD PROFILE ──
+  async function loadProfile() {
+    try {
+      const res = await fetch(`${API}/profile`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) { window.location.href = 'index.html'; return; }
+      const d = await res.json();
+
+      const fullName = d.firstName + ' ' + d.lastName;
+      const initials = (d.firstName[0] + d.lastName[0]).toUpperCase();
+      const joined   = new Date(d.createdAt).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      // Hero
+      document.getElementById('avatarInitials').textContent = initials;
+      document.getElementById('heroName').textContent       = fullName;
+      document.getElementById('heroEmail').textContent      = d.email;
+      document.getElementById('heroRole').textContent       = (d.role === 'Admin' ? '🛡️ مدير' : '🧑‍⚕️ مريض');
+      document.getElementById('heroJoined').textContent     = 'عضو منذ ' + joined;
+
+      // Info
+      document.getElementById('infoEmail').textContent  = d.email;
+      document.getElementById('infoRole').textContent   = d.role === 'Admin' ? 'مدير' : 'مريض';
+      document.getElementById('infoJoined').textContent = joined;
+      document.getElementById('infoId').textContent     = '#' + d.id;
+
+      // Stats
+      document.getElementById('statSchedules').textContent = d.stats.totalSchedules;
+      document.getElementById('statTaken').textContent     = d.stats.takenDoses;
+      document.getElementById('statChats').textContent     = d.stats.chatMessages;
+
+      // Adherence
+      const total = d.stats.totalSchedules;
+      const taken = d.stats.takenDoses;
+      const pct   = total > 0 ? Math.round((taken / total) * 100) : 0;
+      setTimeout(() => { document.getElementById('adherenceBar').style.width = pct + '%'; }, 100);
+      document.getElementById('adherencePct').textContent  = pct + '%';
+      document.getElementById('adherenceText').textContent = pct >= 80 ? '🟢 ممتاز! استمر هكذا' : pct >= 50 ? '🟡 جيد، واصل الالتزام' : total === 0 ? '📋 لا توجد مواعيد بعد' : '🔴 يحتاج تحسين';
+      document.getElementById('a1').textContent = total;
+      document.getElementById('a2').textContent = taken;
+      document.getElementById('a3').textContent = total - taken;
+
+      // Edit form
+      document.getElementById('editFirst').value = d.firstName;
+      document.getElementById('editLast').value  = d.lastName;
+
+      // Avatar from localStorage
+      const saved = localStorage.getItem('avatar_' + d.id);
+      if (saved) showAvatar(saved);
+
+    } catch(e) {
+      console.error(e);
+      showToast('❌ خطأ في تحميل البيانات', 'error');
+    }
+  }
+
+  // ── SAVE PROFILE ──
+  async function saveProfile() {
+    const msg = document.getElementById('profileMsg');
+    msg.style.display = 'none';
+    const btn = document.querySelector('button[onclick="saveProfile()"]');
+    btn.disabled = true;
+    btn.textContent = '⏳ جاري الحفظ...';
+
+    try {
+      const res = await fetch(`${API}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          firstName:       document.getElementById('editFirst').value.trim(),
+          lastName:        document.getElementById('editLast').value.trim(),
+          currentPassword: document.getElementById('editCurrent').value,
+          newPassword:     document.getElementById('editNew').value,
+        })
+      });
+      const data = await res.json();
+      msg.style.display = 'block';
+      if (res.ok) {
+        msg.className   = 'mt-4 p-3 rounded-xl text-sm font-semibold text-center bg-green-50 text-green-700 border border-green-200';
+        msg.textContent = '✅ تم تحديث الملف الشخصي بنجاح!';
+        document.getElementById('heroName').textContent      = data.firstName + ' ' + data.lastName;
+        document.getElementById('avatarInitials').textContent = (data.firstName[0] + data.lastName[0]).toUpperCase();
+        document.getElementById('editCurrent').value = '';
+        document.getElementById('editNew').value     = '';
+        showToast('✅ تم الحفظ بنجاح');
+      } else {
+        msg.className   = 'mt-4 p-3 rounded-xl text-sm font-semibold text-center bg-red-50 text-red-700 border border-red-200';
+        msg.textContent = '❌ ' + (data.message || 'حدث خطأ');
+      }
+    } catch(e) {
+      msg.style.display = 'block';
+      msg.className     = 'mt-4 p-3 rounded-xl text-sm font-semibold text-center bg-red-50 text-red-700 border border-red-200';
+      msg.textContent   = '❌ خطأ في الاتصال';
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = '💾 حفظ التغييرات';
+    }
+  }
+
+  // ── AVATAR ──
+  function handleAvatar(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      showAvatar(ev.target.result);
+      const id = document.getElementById('infoId').textContent.replace('#', '');
+      localStorage.setItem('avatar_' + id, ev.target.result);
+      showToast('✅ تم تحديث الصورة');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function showAvatar(src) {
+    const img      = document.getElementById('avatarImg');
+    const initials = document.getElementById('avatarInitials');
+    img.src              = src;
+    img.style.display    = 'block';
+    initials.style.display = 'none';
+  }
+
+  loadProfile();
+</script>
+</body>
+</html>
