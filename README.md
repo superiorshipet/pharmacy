@@ -1,31 +1,49 @@
 # Dawaee Pharmacy
 
-A full-stack medical platform for browsing medications, managing pharmacy data, and exposing a secure API. The project combines a .NET backend with a static frontend interface and is designed to run locally or on Railway.
+A full-stack medical and pharmacy platform built with an ASP.NET Core backend and a static RTL frontend. The system supports authentication, medication browsing, patient scheduling, admin management, and an AI-powered medication assistant.
+
+## Live Demo
+
+- Frontend: https://tasharuky.duckdns.org/pharmacy/
+- Repository: https://github.com/superiorshipet/pharmacy
 
 ## Overview
 
-This repository contains:
+Dawaee Pharmacy is a demo healthcare platform designed for:
 
-- backend: ASP.NET Core Web API with JWT authentication, PostgreSQL support, Swagger, and seeded demo data
-- frontend: responsive Arabic/RTL web interface for browsing medications and user flows
-- deployment files: Dockerfile and Railway configuration for cloud deployment
+- discovering medications in Arabic and English
+- managing personal medication schedules
+- tracking daily adherence and weekly reports
+- authenticating users with JWT tokens
+- managing admin-only patient and medication workflows
+- chatting with a medication assistant backed by Groq or a local fallback system
 
-## Features
+The project is organized into two main areas:
 
-- Medication catalog with Arabic and English names
-- Pharmacy-style dashboard and profile views
-- JWT-based authentication and authorization
-- Role-based demo accounts (admin and patient)
-- PostgreSQL database integration
-- Swagger API documentation at /swagger
-- Health endpoint at /health
-- Railway-ready deployment configuration
+- backend/: ASP.NET Core Web API
+- frontend/: HTML/CSS/JavaScript patient-facing web app
 
-## Tech Stack
+## Technology Stack
 
-- Backend: C#, ASP.NET Core, Entity Framework Core, PostgreSQL, JWT
-- Frontend: HTML, CSS, JavaScript
-- Deployment: Docker, Railway
+### Backend
+
+- C#
+- ASP.NET Core Web API
+- Entity Framework Core
+- PostgreSQL via Npgsql
+- JWT authentication
+- Swagger / OpenAPI
+- BCrypt for password hashing
+- Docker support
+- Railway deployment support
+
+### Frontend
+
+- HTML
+- CSS
+- JavaScript
+- Tailwind CSS via CDN
+- Arabic RTL layout
 
 ## Repository Structure
 
@@ -33,6 +51,13 @@ This repository contains:
 .
 ├── backend/
 │   ├── Controllers/
+│   │   ├── AdminController.cs
+│   │   ├── AuthController.cs
+│   │   ├── ChatbotController.cs
+│   │   ├── DashboardController.cs
+│   │   ├── MedicationsController.cs
+│   │   ├── ProfileController.cs
+│   │   └── TestController.cs
 │   ├── Data/
 │   ├── DTOs/
 │   ├── Migrations/
@@ -46,74 +71,196 @@ This repository contains:
 │   ├── js/
 │   ├── index.html
 │   └── profile.html
-├── Dockerfile
-├── railway.json
-├── DawaeePlatform.slnx
 ├── .gitignore
-└── README.md
+├── Dockerfile
+├── DawaeePlatform.slnx
+├── railway.json
+├── README.md
+└── ...
 ```
 
-## Getting Started
+## Key Features
+
+### Patient Features
+
+- register and log in
+- receive JWT token access
+- browse medications by name or active ingredient
+- view medication details and warnings
+- create and manage medication schedules
+- mark doses as taken or not taken
+- view weekly medication adherence stats
+- update profile information and password
+- chat with the medication assistant
+
+### Admin Features
+
+- view all patients
+- inspect individual patient details and chat history
+- review adherence rates and schedule information
+- manage medication records
+- create, update, and delete medications
+- delete patient accounts
+
+### AI Chatbot
+
+The chatbot endpoint uses:
+
+- a Groq LLM when `Groq:ApiKey` is configured
+- a built-in local response system as a fallback
+
+It includes emergency response handling and medication-specific assistance, while also storing chat history per user.
+
+## API Overview
+
+The backend exposes the API under `/api` and includes the following controllers:
+
+### Auth
+
+- `POST /api/auth/register`
+  - registers a new patient user
+  - returns a JWT token
+- `POST /api/auth/login`
+  - authenticates a user
+  - returns user profile data and JWT token
+
+### Medications
+
+- `GET /api/medications?search={term}`
+  - returns medication records
+  - supports search by Arabic/English names and active ingredients
+
+### Profile
+
+- `GET /api/profile`
+  - returns current user profile and summary stats
+- `PUT /api/profile`
+  - updates first name, last name, and optionally password
+
+### Dashboard
+
+- `GET /api/dashboard/schedules`
+  - returns today's scheduled medications for the authenticated user
+- `POST /api/dashboard/schedules`
+  - creates a new medication schedule
+- `PUT /api/dashboard/schedules/toggle`
+  - marks a schedule as taken or not taken
+- `DELETE /api/dashboard/schedules/{id}`
+  - removes a schedule
+- `GET /api/dashboard/weekly-report`
+  - returns weekly adherence statistics
+
+### Chatbot
+
+- `POST /api/chatbot/chat`
+  - sends a chat message and receives AI-generated output
+- `GET /api/chatbot/history`
+  - returns recent user chat history
+
+### Admin
+
+- `GET /api/admin/patients`
+  - lists all patients and their adherence summary
+- `GET /api/admin/patients/{id}`
+  - gets a patient profile with schedules and chat history
+- `DELETE /api/admin/patients/{id}`
+  - removes a patient
+- `GET /api/admin/medications`
+  - lists medications
+- `POST /api/admin/medications`
+  - creates a medication
+- `PUT /api/admin/medications/{id}`
+  - updates a medication
+- `DELETE /api/admin/medications/{id}`
+  - removes a medication
+
+### Health
+
+- `GET /health`
+  - basic application health endpoint
+
+## Local Development
 
 ### Prerequisites
 
 - .NET 10 SDK
 - PostgreSQL database
-- Optional: Docker for containerized deployment
+- optional: Docker
 
-### Backend setup
+### Backend Setup
 
 ```bash
 cd backend
- dotnet restore
- dotnet run
+dotnet restore
+dotnet run
 ```
 
-The API will be available at:
+The backend uses local connection strings from `appsettings.json` when no environment variables are set.
 
-- Swagger UI: http://localhost:5000/swagger
-- Health check: http://localhost:5000/health
+Swagger UI is available at:
 
-### Frontend setup
+```text
+http://localhost:5000/swagger
+```
 
-Open the frontend in a browser, or serve it locally with a lightweight static server.
+Health endpoint:
 
-Example:
+```text
+http://localhost:5000/health
+```
+
+### Frontend Setup
+
+You can open the frontend directly in a browser or serve it locally.
 
 ```bash
 cd frontend
 python -m http.server 8000
 ```
 
-Then visit:
+Then open:
 
-- http://localhost:8000
+```text
+http://localhost:8000
+```
 
 ## Environment Variables
 
-The backend reads these values when present:
+The application supports the following environment variables:
 
-- DATABASE_URL
-- JWT_KEY
-- RAILWAY_ENVIRONMENT
+- `DATABASE_URL`
+- `JWT_KEY`
+- `RAILWAY_ENVIRONMENT`
+- `Groq:ApiKey`
+- `Groq:Model`
 
-If no database URL is supplied, it falls back to connection strings from appsettings.json for local development.
+### Database behavior
 
-## Demo Credentials
+The backend auto-detects whether it is running in Railway or local mode:
 
-Seeded users from the application include:
+- if `DATABASE_URL` exists, it converts it to a PostgreSQL connection string
+- otherwise it falls back to `LocalConnection` or `RailwayConnection`
 
-- Admin: admin@dawaee.com / Admin123!
-- Patient: patient@test.com / Patient123!
+## Seeded Demo Accounts
+
+When the app starts, it seeds default users:
+
+- Admin: `admin@dawaee.com` / `Admin123!`
+- Patient: `patient@test.com` / `Patient123!`
 
 ## Deployment
 
-The project includes a Dockerfile and Railway configuration for deployment. For Railway, the application expects PostgreSQL connectivity and environment variables such as DATABASE_URL and JWT_KEY.
+The repository includes:
 
-## License
+- `Dockerfile` for containerized deployment
+- `railway.json` for Railway hosting
 
-This project does not currently specify a license file.
+The app is configured to run in a cloud environment with PostgreSQL and environment variables such as `DATABASE_URL` and `JWT_KEY`.
 
 ## Notes
 
-This repository is a demo medical/pharmacy platform with seeded content and sample accounts intended for development and demonstration purposes.
+This project is a demonstration medical/pharmacy platform with seed data and sample accounts intended for local development, testing, and presentation purposes.
+
+## License
+
+This repository does not currently include a license file.
