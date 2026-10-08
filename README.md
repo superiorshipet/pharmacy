@@ -1,41 +1,38 @@
 # Dawaee Pharmacy
 
-A full-stack medical and pharmacy platform built with an ASP.NET Core backend and a static RTL frontend. The system supports authentication, medication browsing, patient scheduling, admin management, and an AI-powered medication assistant.
+A full-stack Arabic/English medical platform for managing medications, patient schedules, and healthcare dashboard workflows. The project combines a .NET backend with a static frontend and includes AI-assisted medication chat support.
 
 ## Live Demo
 
 - Frontend: https://tasharuky.duckdns.org/pharmacy/
 - Repository: https://github.com/superiorshipet/pharmacy
 
-## Overview
+## Project Summary
 
-Dawaee Pharmacy is a demo healthcare platform designed for:
+Dawaee Pharmacy is designed to help patients and administrators manage healthcare-related workflows through a simple web experience. It includes:
 
-- discovering medications in Arabic and English
-- managing personal medication schedules
-- tracking daily adherence and weekly reports
-- authenticating users with JWT tokens
-- managing admin-only patient and medication workflows
-- chatting with a medication assistant backed by Groq or a local fallback system
+- medication catalog browsing
+- personal medication scheduling
+- adherence tracking and weekly reports
+- JWT-based authentication
+- profile management
+- admin tools for patient and medication management
+- medication chatbot with Groq AI support and local fallback
+- deployment support for Docker and Railway
 
-The project is organized into two main areas:
-
-- backend/: ASP.NET Core Web API
-- frontend/: HTML/CSS/JavaScript patient-facing web app
-
-## Technology Stack
+## Tech Stack
 
 ### Backend
 
 - C#
 - ASP.NET Core Web API
 - Entity Framework Core
-- PostgreSQL via Npgsql
+- PostgreSQL (Npgsql)
 - JWT authentication
 - Swagger / OpenAPI
-- BCrypt for password hashing
+- BCrypt.Net for password hashing
 - Docker support
-- Railway deployment support
+- Railway-ready configuration
 
 ### Frontend
 
@@ -43,7 +40,7 @@ The project is organized into two main areas:
 - CSS
 - JavaScript
 - Tailwind CSS via CDN
-- Arabic RTL layout
+- RTL Arabic layout
 
 ## Repository Structure
 
@@ -79,115 +76,182 @@ The project is organized into two main areas:
 └── ...
 ```
 
-## Key Features
+## Features
 
 ### Patient Features
 
-- register and log in
-- receive JWT token access
-- browse medications by name or active ingredient
-- view medication details and warnings
-- create and manage medication schedules
-- mark doses as taken or not taken
-- view weekly medication adherence stats
-- update profile information and password
+- register a new patient account
+- log in securely with JWT
+- browse medications by Arabic/English name or active ingredient
+- view medication details, ingredient information, warnings, and risk level
+- create medication reminders/schedules
+- toggle dose completion status
+- remove schedules
+- see daily and weekly adherence performance
+- update account profile and password
 - chat with the medication assistant
 
 ### Admin Features
 
-- view all patients
-- inspect individual patient details and chat history
-- review adherence rates and schedule information
-- manage medication records
+- list all patients
+- view patient details, schedules, and chat history
+- evaluate adherence percentages
+- manage medication catalog entries
 - create, update, and delete medications
-- delete patient accounts
+- delete patient records
 
 ### AI Chatbot
 
-The chatbot endpoint uses:
+The chatbot is implemented in `ChatbotController` and includes:
 
-- a Groq LLM when `Groq:ApiKey` is configured
-- a built-in local response system as a fallback
+- Groq API integration when `Groq:ApiKey` is configured
+- local fallback responses for offline or missing-key scenarios
+- emergency detection for urgent cases
+- medication lookups and personalized responses grounded in the medication catalog
+- saved user chat history
 
-It includes emergency response handling and medication-specific assistance, while also storing chat history per user.
+## Application Behavior
 
-## API Overview
+### Backend Boot Flow
 
-The backend exposes the API under `/api` and includes the following controllers:
+`Program.cs` performs the following on startup:
 
-### Auth
+- configures controllers and Swagger
+- configures JWT authentication
+- configures CORS
+- connects to PostgreSQL
+- detects Railway vs local environment
+- exposes `/health`
+- ensures database tables exist
+- seeds default demo data
+- starts the ASP.NET Core application
+
+### Database and Demo Data
+
+The app seeds default records for demo use, including:
+
+- admin user
+- patient user
+- a list of sample medications
+
+## API Documentation
+
+The API is served at `/api` and documented with Swagger UI at `/swagger`.
+
+### Authentication
+
+#### Register
 
 - `POST /api/auth/register`
-  - registers a new patient user
-  - returns a JWT token
+
+Request body example:
+
+```json
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john@example.com",
+  "password": "StrongPass123!",
+  "chronicDiseases": "Diabetes"
+}
+```
+
+Response includes a JWT token and user info.
+
+#### Login
+
 - `POST /api/auth/login`
-  - authenticates a user
-  - returns user profile data and JWT token
+
+Request body example:
+
+```json
+{
+  "email": "patient@test.com",
+  "password": "Patient123!"
+}
+```
 
 ### Medications
 
-- `GET /api/medications?search={term}`
-  - returns medication records
-  - supports search by Arabic/English names and active ingredients
+- `GET /api/medications`
+- `GET /api/medications?search=panadol`
+
+Returns medication records with Arabic and English names, active ingredients, descriptions, warnings, and danger level.
 
 ### Profile
 
 - `GET /api/profile`
-  - returns current user profile and summary stats
 - `PUT /api/profile`
-  - updates first name, last name, and optionally password
+
+The profile endpoint returns current user details and usage statistics such as:
+
+- total schedules
+- taken doses
+- chat message count
 
 ### Dashboard
 
 - `GET /api/dashboard/schedules`
-  - returns today's scheduled medications for the authenticated user
 - `POST /api/dashboard/schedules`
-  - creates a new medication schedule
 - `PUT /api/dashboard/schedules/toggle`
-  - marks a schedule as taken or not taken
 - `DELETE /api/dashboard/schedules/{id}`
-  - removes a schedule
 - `GET /api/dashboard/weekly-report`
-  - returns weekly adherence statistics
+
+These endpoints are protected and allow authenticated patients to manage medication timing and adherence reports.
 
 ### Chatbot
 
 - `POST /api/chatbot/chat`
-  - sends a chat message and receives AI-generated output
 - `GET /api/chatbot/history`
-  - returns recent user chat history
+
+The chatbot sends a user message and returns a response generated from either Groq or a local fallback logic. Previous conversation history is stored per user.
 
 ### Admin
 
 - `GET /api/admin/patients`
-  - lists all patients and their adherence summary
 - `GET /api/admin/patients/{id}`
-  - gets a patient profile with schedules and chat history
 - `DELETE /api/admin/patients/{id}`
-  - removes a patient
 - `GET /api/admin/medications`
-  - lists medications
 - `POST /api/admin/medications`
-  - creates a medication
 - `PUT /api/admin/medications/{id}`
-  - updates a medication
 - `DELETE /api/admin/medications/{id}`
-  - removes a medication
+
+Admin routes require the `Admin` role.
 
 ### Health
 
 - `GET /health`
-  - basic application health endpoint
 
-## Local Development
+Returns a lightweight health response indicating the app status and environment.
+
+## Frontend Overview
+
+The frontend is static and includes the main app entry point plus a profile page.
+
+### `frontend/index.html`
+
+This is the primary patient dashboard and landing page. It includes:
+
+- Arabic RTL design
+- Tailwind-based layout
+- medication browsing interface
+- chatbot widget
+- modal and toast interfaces
+- schedule and dashboard interactions
+
+### `frontend/profile.html`
+
+This provides the user profile experience and additional account actions.
+
+## Local Setup
 
 ### Prerequisites
 
 - .NET 10 SDK
-- PostgreSQL database
+- PostgreSQL server
 - optional: Docker
 
-### Backend Setup
+### Backend
 
 ```bash
 cd backend
@@ -195,23 +259,23 @@ dotnet restore
 dotnet run
 ```
 
-The backend uses local connection strings from `appsettings.json` when no environment variables are set.
+The app will run with local database settings when environment variables are not configured.
 
-Swagger UI is available at:
+Swagger UI:
 
 ```text
 http://localhost:5000/swagger
 ```
 
-Health endpoint:
+Health check:
 
 ```text
 http://localhost:5000/health
 ```
 
-### Frontend Setup
+### Frontend
 
-You can open the frontend directly in a browser or serve it locally.
+Serve the frontend locally:
 
 ```bash
 cd frontend
@@ -226,7 +290,7 @@ http://localhost:8000
 
 ## Environment Variables
 
-The application supports the following environment variables:
+The app reads these values when provided:
 
 - `DATABASE_URL`
 - `JWT_KEY`
@@ -234,33 +298,32 @@ The application supports the following environment variables:
 - `Groq:ApiKey`
 - `Groq:Model`
 
-### Database behavior
+### Runtime behavior
 
-The backend auto-detects whether it is running in Railway or local mode:
+- if `DATABASE_URL` is present, it is converted into a PostgreSQL connection string
+- otherwise it falls back to local configuration values
+- if a Groq key is not configured, the chatbot falls back to local scripted responses
 
-- if `DATABASE_URL` exists, it converts it to a PostgreSQL connection string
-- otherwise it falls back to `LocalConnection` or `RailwayConnection`
+## Demo Credentials
 
-## Seeded Demo Accounts
-
-When the app starts, it seeds default users:
+Seeded accounts:
 
 - Admin: `admin@dawaee.com` / `Admin123!`
 - Patient: `patient@test.com` / `Patient123!`
 
 ## Deployment
 
-The repository includes:
+The repository contains deployment configuration for cloud hosting:
 
-- `Dockerfile` for containerized deployment
-- `railway.json` for Railway hosting
+- `Dockerfile`
+- `railway.json`
 
-The app is configured to run in a cloud environment with PostgreSQL and environment variables such as `DATABASE_URL` and `JWT_KEY`.
+The app is designed to run in a containerized or Railway environment with PostgreSQL connectivity and environment variables set.
 
 ## Notes
 
-This project is a demonstration medical/pharmacy platform with seed data and sample accounts intended for local development, testing, and presentation purposes.
+This repository is a demo medical/pharmacy project with sample data and seeded users intended for development, testing, and presentation use.
 
 ## License
 
-This repository does not currently include a license file.
+No explicit project license file is included in the repository at this time.
